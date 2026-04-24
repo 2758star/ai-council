@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ethereal Secretary - ADHD Focused Calendar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#dfd2ed",
+                        "surface-variant": "#dee3e9",
+                        "on-tertiary": "#fef7ff",
+                        "on-surface-variant": "#5a6065",
+                        "on-secondary-fixed": "#074748",
+                        "primary-fixed-dim": "#8891ed",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#316768",
+                        "error-dim": "#6b0221",
+                        "secondary-fixed-dim": "#a8dedf",
+                        "tertiary-fixed": "#ede0fc",
+                        "surface-dim": "#d5dbe1",
+                        "on-primary-container": "#101974",
+                        "tertiary-container": "#ede0fc",
+                        "surface-tint": "#4e57ae",
+                        "surface-container-highest": "#dee3e9",
+                        "on-surface": "#2d3338",
+                        "secondary-fixed": "#b6eded",
+                        "on-background": "#2d3338",
+                        "on-secondary": "#e0ffff",
+                        "on-primary-fixed-variant": "#1c257d",
+                        "primary-dim": "#414aa1",
+                        "surface-bright": "#f8f9fc",
+                        "surface-container-low": "#f1f4f8",
+                        "primary-container": "#959efc",
+                        "primary": "#4e57ae",
+                        "on-primary-fixed": "#000129",
+                        "tertiary-dim": "#584f65",
+                        "on-secondary-fixed-variant": "#2d6465",
+                        "error-container": "#f97386",
+                        "on-error-container": "#6e0523",
+                        "outline-variant": "#adb3b8",
+                        "on-tertiary-fixed": "#463d53",
+                        "on-primary": "#fbf8ff",
+                        "on-tertiary-container": "#584f66",
+                        "error": "#a8364b",
+                        "secondary-container": "#b6eded",
+                        "inverse-surface": "#0c0f11",
+                        "on-tertiary-fixed-variant": "#625970",
+                        "surface-container": "#ebeef3",
+                        "surface": "#f8f9fc",
+                        "on-error": "#fff7f7",
+                        "outline": "#767b81",
+                        "on-secondary-container": "#225a5b",
+                        "secondary-dim": "#245b5c",
+                        "background": "#f8f9fc",
+                        "surface-container-high": "#e4e8ee",
+                        "tertiary": "#645b72",
+                        "inverse-primary": "#959efc",
+                        "inverse-on-surface": "#9b9da0",
+                        "primary-fixed": "#959efc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f4f8; /* Surface Container Low */
+            overflow: hidden; /* No scrolling constraint */
+            height: 100vh;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+        }
+        .timeline-container {
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+    </style>
+</head>
+<body class="text-on-surface font-body select-none">
+<!-- SideNavBar (Rail) -->
+<aside class="fixed left-4 top-4 bottom-4 w-20 rounded-3xl bg-slate-100/40 backdrop-blur-xl flex flex-col items-center py-8 space-y-8 shadow-xl shadow-slate-200/50 z-50">
+<div class="mb-4">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<nav class="flex flex-col space-y-6">
+<button class="p-3 text-slate-500 hover:bg-slate-200/50 transition-colors rounded-2xl">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+</button>
+<button class="p-3 bg-white text-indigo-600 shadow-sm rounded-2xl">
+<span class="material-symbols-outlined" data-icon="calendar_month" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+</button>
+<button class="p-3 text-slate-500 hover:bg-slate-200/50 transition-colors rounded-2xl">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+</button>
+<button class="p-3 text-slate-500 hover:bg-slate-200/50 transition-colors rounded-2xl">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+</button>
+<button class="p-3 text-slate-500 hover:bg-slate-200/50 transition-colors rounded-2xl mt-auto">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</nav>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 left-24 right-80 h-24 flex justify-between items-center px-8 z-40">
+<div class="flex items-center space-gap-6">
+<h1 class="text-xl font-headline font-bold bg-gradient-to-br from-indigo-600 to-indigo-400 bg-clip-text text-transparent">Ethereal Secretary</h1>
+<div class="ml-12 flex space-x-1 bg-surface-container rounded-full p-1 h-10">
+<button class="px-6 rounded-full text-sm font-medium text-indigo-600 bg-white shadow-sm">Today</button>
+<button class="px-6 rounded-full text-sm font-medium text-slate-400 hover:text-slate-900 transition-all">Week</button>
+<button class="px-6 rounded-full text-sm font-medium text-slate-400 hover:text-slate-900 transition-all">Planner</button>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<button class="p-2 text-slate-400 hover:text-indigo-600 transition-colors">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-indigo-600 transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="ml-4 px-5 py-2 bg-gradient-to-br from-primary to-primary-container text-white rounded-lg text-sm font-medium shadow-lg shadow-primary/20">
+                New Event
+            </button>
+</div>
+</header>
+<!-- Intelligence Rail (Right Drawer) -->
+<aside class="fixed right-0 top-0 bottom-0 w-80 bg-slate-50 p-6 border-l border-slate-100 flex flex-col space-y-8 z-50">
+<div>
+<h2 class="font-headline text-xs uppercase tracking-widest text-slate-400 mb-6">Intelligence Rail</h2>
+<div class="space-y-1">
+<p class="text-xs text-slate-400">Secretary Briefing</p>
+<p class="text-lg font-headline font-bold text-on-surface">Friday, Oct 24</p>
+</div>
+</div>
+<div class="bg-indigo-50/50 rounded-2xl p-5 space-y-4 border border-indigo-100/50">
+<div class="flex items-center space-x-2 text-indigo-600">
+<span class="material-symbols-outlined text-sm" data-icon="auto_awesome">auto_awesome</span>
+<span class="text-xs font-bold uppercase tracking-tighter">Priority Briefing</span>
+</div>
+<p class="text-sm text-slate-600 leading-relaxed">
+                You have 3 core focus blocks today. The <span class="text-indigo-700 font-semibold">Q4 Expansion</span> planning is your high-energy task. 
+            </p>
+<div class="flex items-center space-x-3 pt-2">
+<div class="flex -space-x-2">
+<img class="w-6 h-6 rounded-full border-2 border-white" data-alt="portrait of a professional male colleague for meeting context" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9vNF2rnO8EdY8fEiPgLveSvFjXQGNq9OjA5vLqgXO2UCV2zZnRvOnHE4AYjbADE1JMS7iEkquVJ2OZh_9DJaXQCqmna-SuJAdxSM4u3gC6vMcVSOT5AFbZjcPFY8c6tFQVqhDwWvGu97SWph8IBg_mfZTRqUKGwGf9pH1WMtLhd1Qwxh_XCSTpvBcNOVConmhROlCf8AYs-izhXYCvlIRrmFmsq1yRTIkcnRKohvbwfOXkXd6Hh7jWIArIeIyQp-wGoK3Y_kyJrac"/>
+<img class="w-6 h-6 rounded-full border-2 border-white" data-alt="portrait of a professional female colleague for meeting context" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYxdHHKXfbSK8ZsZv0LmyJBTYHeV-dErdXJtDMFHjbSAM6-aXeuNgML4SBpItzJuvfhXLuxBWXAbgH-8GkTMD7d_gFzSDk30d7ewyAAW7a2HL0nckHG4SGzKUyTKXzHcc_4HU07MdH6m4USri91OPedvVE6xaBIGKaU3Gp4JuXD4qgSECG06akOy7awBCnT9EFxKl0ssL87xOSLrpD_DsRMnPG7947K-jJtev8A0hmAVZsuK_3HzcGUc9zRLf0UHn3OlQiINfVps2i"/>
+</div>
+<span class="text-[10px] font-medium text-slate-500">+2 attending OmniCorp</span>
+</div>
+</div>
+<div class="space-y-4">
+<h3 class="font-headline text-xs uppercase tracking-widest text-slate-400">Next Up</h3>
+<div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 group hover:border-indigo-200 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] px-2 py-1 bg-secondary-container text-on-secondary-container rounded-md font-bold uppercase">External</span>
+<span class="text-xs font-medium text-slate-400">11:30 AM</span>
+</div>
+<p class="text-sm font-semibold text-on-surface">Client Sync: OmniCorp</p>
+<div class="mt-4 flex items-center text-xs text-indigo-600 font-medium">
+<span class="material-symbols-outlined text-sm mr-1" data-icon="link">link</span>
+                    Join Video Call
+                </div>
+</div>
+</div>
+<div class="mt-auto bg-slate-200/30 rounded-2xl p-4 flex items-center space-x-4">
+<img class="w-10 h-10 rounded-xl object-cover" data-alt="User profile avatar of a focused professional woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBppfHBQVGcxbQmortlM2eq6YaH41Ncc8JdnGwG9mgdy1kQn5JUA7iqqqWYwxsGZE4yeQQ1c0zQ-8Yt9vsqZu9u8c810I9cZQMxIS-1n0Cizg_5VakpACpYuHWwcABG32O12i_JgYRh_YVHhbyeAU0yrZ2aqmqrUFQz8S7kJ5cnj3Az6yC5ag0bE5SlhBxypv6YD-aJmg0J2CyiQGq4Ptskhgnqekw0H4fa73ZlZ_29Oh5CeqQ_ulXLKswdc3VixLIpHLfWvBQ6ZclZ"/>
+<div>
+<p class="text-sm font-bold text-on-surface">Alex Mercer</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-wider">Premium Edition</p>
+</div>
+</div>
+</aside>
+<!-- Main Central Workspace -->
+<main class="ml-24 mr-80 pt-24 pb-8 h-screen flex flex-col px-12">
+<!-- Today's Spotlight Title -->
+<div class="mb-12">
+<p class="text-sm font-medium text-indigo-500 mb-1">CURRENTLY IN PROGRESS</p>
+<h2 class="text-4xl font-headline font-extrabold text-on-surface tracking-tight">Strategic Planning - Q4 Expansion</h2>
+<div class="flex items-center mt-3 text-slate-400 space-x-4">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mr-1" data-icon="schedule">schedule</span>
+<span class="text-sm font-medium">10:15 AM — 11:30 AM</span>
+</div>
+<div class="w-1.5 h-1.5 bg-slate-300 rounded-full"></div>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mr-1" data-icon="location_on">location_on</span>
+<span class="text-sm font-medium">Deep Work Zone</span>
+</div>
+</div>
+</div>
+<!-- Zoomed Timeline (9 AM - 6 PM) -->
+<div class="flex-1 relative">
+<!-- Time Axis Labels -->
+<div class="absolute left-0 top-0 bottom-0 w-16 flex flex-col justify-between py-2 text-[10px] font-bold text-slate-300 uppercase tracking-widest pointer-events-none">
+<div>09:00</div>
+<div class="text-indigo-400 font-extrabold">10:00</div>
+<div>11:00</div>
+<div>12:00</div>
+<div>13:00</div>
+<div>14:00</div>
+<div>15:00</div>
+<div>16:00</div>
+<div>17:00</div>
+<div>18:00</div>
+</div>
+<!-- Timeline Canvas -->
+<div class="ml-20 h-full flex flex-col space-y-4 relative">
+<!-- 09:00 - 10:00 (Past/Completed) -->
+<div class="h-[12%] bg-surface-container/30 rounded-2xl flex items-center px-6 opacity-40 grayscale-[0.5]">
+<div class="flex flex-col">
+<span class="text-xs font-bold text-slate-400">09:00 - 10:00</span>
+<span class="text-sm font-medium text-slate-500 line-through">Inbox Triage &amp; Coffee</span>
+</div>
+</div>
+<!-- 10:15 - 11:30 (Current Block - Active Spotlight) -->
+<div class="h-[35%] glass-panel rounded-3xl border border-indigo-100 shadow-2xl shadow-indigo-100/50 flex flex-col p-8 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-8">
+<span class="material-symbols-outlined text-indigo-200 text-6xl opacity-30" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+</div>
+<div class="flex items-center space-x-2 mb-4">
+<span class="px-2 py-0.5 bg-indigo-600 text-white text-[10px] font-black rounded uppercase tracking-widest">Focus Mode</span>
+<span class="text-xs font-bold text-indigo-400">42 Minutes Remaining</span>
+</div>
+<div class="mt-2 space-y-4 max-w-lg">
+<h3 class="text-2xl font-headline font-bold text-indigo-900">Strategic Planning - Q4 Expansion</h3>
+<p class="text-sm text-indigo-700/70 leading-relaxed">Goals: Finalize regional targets, review logistics budget, and prepare the executive summary for Monday's board review.</p>
+<div class="flex space-x-2 pt-4">
+<button class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold flex items-center">
+<span class="material-symbols-outlined text-sm mr-2" data-icon="check_circle">check_circle</span>
+                                Mark Complete
+                            </button>
+<button class="px-4 py-2 bg-white text-indigo-600 border border-indigo-100 rounded-lg text-xs font-bold">
+                                Add Note
+                            </button>
+</div>
+</div>
+<!-- Subtle progress bar at bottom -->
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-slate-100">
+<div class="h-full bg-indigo-500 w-[60%]"></div>
+</div>
+</div>
+<!-- 11:30 - 12:00 (Buffer Block) -->
+<div class="h-[8%] bg-slate-200/20 rounded-xl flex items-center px-6 border border-dashed border-slate-300">
+<span class="material-symbols-outlined text-slate-300 mr-3" data-icon="coffee">coffee</span>
+<span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Buffer / Decompression</span>
+</div>
+<!-- 12:00 - 13:00 (Upcoming Block) -->
+<div class="h-[15%] bg-white rounded-2xl flex items-center px-8 shadow-sm border border-slate-50 group hover:shadow-md transition-all">
+<div class="flex flex-col flex-1">
+<div class="flex items-center space-x-2 mb-1">
+<span class="text-[10px] font-bold text-secondary uppercase tracking-widest">Team</span>
+<span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+<span class="text-xs font-medium text-slate-400">12:00 PM</span>
+</div>
+<span class="text-md font-bold text-on-surface">Internal Product Standup</span>
+</div>
+<span class="material-symbols-outlined text-slate-200 group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</div>
+<!-- Timeline "Current Time" Indicator Line -->
+<div class="absolute top-[28%] left-[-20px] right-0 flex items-center pointer-events-none z-10">
+<div class="w-3 h-3 bg-indigo-600 rounded-full ring-4 ring-white shadow-lg"></div>
+<div class="flex-1 h-0.5 bg-indigo-600/30 ml-2"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Visual Overlays (ADHD Focus Support) -->
+<div class="fixed top-0 bottom-0 left-0 right-0 pointer-events-none border-[16px] border-white/10 z-50"></div>
+</body></html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Curator Pro - Tasks &amp; Schedule</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#6e0523",
+                        "primary-fixed-dim": "#8891ed",
+                        "secondary-container": "#b6eded",
+                        "inverse-primary": "#959efc",
+                        "surface-tint": "#4e57ae",
+                        "secondary-fixed-dim": "#a8dedf",
+                        "inverse-on-surface": "#9b9da0",
+                        "on-primary": "#fbf8ff",
+                        "secondary-dim": "#245b5c",
+                        "on-tertiary-fixed-variant": "#625970",
+                        "background": "#f8f9fc",
+                        "surface-container": "#ebeef3",
+                        "secondary": "#316768",
+                        "outline-variant": "#adb3b8",
+                        "surface-variant": "#dee3e9",
+                        "tertiary-dim": "#584f65",
+                        "on-surface-variant": "#5a6065",
+                        "on-tertiary-fixed": "#463d53",
+                        "tertiary-fixed": "#ede0fc",
+                        "tertiary-container": "#ede0fc",
+                        "surface-bright": "#f8f9fc",
+                        "on-background": "#2d3338",
+                        "error-container": "#f97386",
+                        "primary-dim": "#414aa1",
+                        "error-dim": "#6b0221",
+                        "on-error": "#fff7f7",
+                        "on-secondary-container": "#225a5b",
+                        "surface": "#f8f9fc",
+                        "on-primary-fixed-variant": "#1c257d",
+                        "primary-container": "#959efc",
+                        "tertiary-fixed-dim": "#dfd2ed",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#a8364b",
+                        "on-secondary-fixed": "#074748",
+                        "outline": "#767b81",
+                        "tertiary": "#645b72",
+                        "primary-fixed": "#959efc",
+                        "primary": "#4e57ae",
+                        "surface-dim": "#d5dbe1",
+                        "on-surface": "#2d3338",
+                        "surface-container-high": "#e4e8ee",
+                        "on-tertiary": "#fef7ff",
+                        "surface-container-highest": "#dee3e9",
+                        "on-secondary": "#e0ffff",
+                        "on-primary-container": "#101974",
+                        "on-primary-fixed": "#000129",
+                        "on-tertiary-container": "#584f66",
+                        "on-secondary-fixed-variant": "#2d6465",
+                        "surface-container-low": "#f1f4f8",
+                        "inverse-surface": "#0c0f11",
+                        "secondary-fixed": "#b6eded"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar Component -->
+<header class="w-full h-16 sticky top-0 z-40 bg-[#ebeef3] dark:bg-[#1a1d21] shadow-none flex justify-between items-center px-8">
+<div class="flex items-center gap-8">
+<span class="text-xl font-extrabold tracking-tighter text-[#6E77D1] dark:text-[#959EFF] font-headline">Curator Pro</span>
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="w-full bg-surface-container-high border-none rounded-lg py-1.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search workspace..." type="text"/>
+</div>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-500 dark:text-slate-400 font-['Manrope'] font-semibold tracking-tight hover:bg-white/50 dark:hover:bg-white/10 transition-colors px-3 py-2 rounded-lg" href="#">Home</a>
+<a class="text-[#6E77D1] dark:text-[#959EFF] font-bold font-['Manrope'] tracking-tight px-3 py-2 rounded-lg" href="#">Calendar</a>
+<a class="text-slate-500 dark:text-slate-400 font-['Manrope'] font-semibold tracking-tight hover:bg-white/50 dark:hover:bg-white/10 transition-colors px-3 py-2 rounded-lg" href="#">Reports</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<button class="p-2 text-slate-500 hover:bg-white/50 rounded-full transition-colors"><span class="material-symbols-outlined" data-icon="notifications">notifications</span></button>
+<button class="p-2 text-slate-500 hover:bg-white/50 rounded-full transition-colors"><span class="material-symbols-outlined" data-icon="settings">settings</span></button>
+<button class="p-2 text-slate-500 hover:bg-white/50 rounded-full transition-colors"><span class="material-symbols-outlined" data-icon="help">help</span></button>
+</div>
+<img alt="User profile" class="w-8 h-8 rounded-full border-2 border-primary-container shadow-sm" data-alt="Professional headshot of a creative director in a minimalist studio setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb0YAWja4X3xNSL01WeA41dRh5gN8D26Zojx8dY-ppmuRB5UYSd--bVpGmek8Hstmfb1Coj5fCfABZiT-pyoIWshPikP8y8TVzvhdS_8xuLF3GHTd6WI_UEXTtPnn_gn96o9iaRYdV1YjwhMx9seNG0L2Q8ejDaoiGxxZIXcIPCCQ39sC5m7w6B7kcxAioeL2FvzaEjCJNwJum32TFFJlS4njt-livqzboCQAB_2u-mDZa4U6oJF7iHXvbCTVTzHi6RQt_rYBUJpzL"/>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar Component (Dashboard Active) -->
+<aside class="h-full w-64 bg-[#ebeef3] dark:bg-[#1a1d21] flex flex-col py-6 px-4 flex-shrink-0">
+<div class="mb-8 px-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-lg">
+<span class="material-symbols-outlined" data-icon="auto_stories" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+</div>
+<div>
+<p class="font-['Inter'] text-sm font-bold text-on-surface">Workspace</p>
+<p class="text-[10px] uppercase tracking-widest text-outline">Premium Edition</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-white/40 dark:hover:bg-white/5 transition-all group active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="font-['Inter'] text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#6E77D1] dark:text-[#959EFF] font-bold border-r-2 border-[#6E77D1] bg-white/40 group active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open" style="font-variation-settings: 'FILL' 1;">folder_open</span>
+<span class="font-['Inter'] text-sm">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-white/40 transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-['Inter'] text-sm">Insights</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-white/40 transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+<span class="font-['Inter'] text-sm">Library</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-white/40 transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-['Inter'] text-sm">Team</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant/10 pt-4">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-white/40 transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+<span class="font-['Inter'] text-sm">Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-white/40 transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+<span class="font-['Inter'] text-sm">Trash</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 bg-surface-container-low p-8 flex gap-8 overflow-hidden">
+<!-- Calendar Section -->
+<section class="flex-[2] flex flex-col gap-6 h-full">
+<div class="flex justify-between items-end">
+<header>
+<h1 class="text-3xl font-headline font-extrabold text-on-surface tracking-tight">October 2024</h1>
+<p class="text-on-surface-variant font-body mt-1">High workload month: 24 active projects</p>
+</header>
+<div class="flex bg-surface-container-highest p-1 rounded-lg">
+<button class="px-4 py-1.5 text-xs font-bold bg-surface-container-lowest rounded-md shadow-sm text-primary">Month</button>
+<button class="px-4 py-1.5 text-xs font-medium text-on-surface-variant hover:text-on-surface">Week</button>
+</div>
+</div>
+<!-- Calendar Grid (Bento Style) -->
+<div class="grid grid-cols-7 grid-rows-6 gap-2 flex-1 min-h-0">
+<!-- Day Headers -->
+<div class="text-center text-[10px] font-bold uppercase tracking-widest text-outline-variant pb-2">Mon</div>
+<div class="text-center text-[10px] font-bold uppercase tracking-widest text-outline-variant pb-2">Tue</div>
+<div class="text-center text-[10px] font-bold uppercase tracking-widest text-outline-variant pb-2">Wed</div>
+<div class="text-center text-[10px] font-bold uppercase tracking-widest text-outline-variant pb-2">Thu</div>
+<div class="text-center text-[10px] font-bold uppercase tracking-widest text-outline-variant pb-2">Fri</div>
+<div class="text-center text-[10px] font-bold uppercase tracking-widest text-outline-variant pb-2">Sat</div>
+<div class="text-center text-[10px] font-bold uppercase tracking-widest text-outline-variant pb-2">Sun</div>
+<!-- Calendar Cells with Heatmap Indicators -->
+<!-- Row 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-3 border border-outline-variant/5 opacity-40">
+<span class="text-xs font-medium text-on-surface-variant">26</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3 border border-outline-variant/5 opacity-40">
+<span class="text-xs font-medium text-on-surface-variant">27</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3 border border-outline-variant/5 opacity-40">
+<span class="text-xs font-medium text-on-surface-variant">28</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3 border border-outline-variant/5 opacity-40">
+<span class="text-xs font-medium text-on-surface-variant">29</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3 border border-outline-variant/5 opacity-40">
+<span class="text-xs font-medium text-on-surface-variant">30</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3 flex flex-col items-start justify-between">
+<span class="text-xs font-bold text-on-surface">1</span>
+<div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary-container"></div></div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3 flex flex-col items-start justify-between">
+<span class="text-xs font-bold text-on-surface">2</span>
+</div>
+<!-- Row 2 (Busy Density starts) -->
+<div class="bg-surface-container-lowest rounded-xl p-3 flex flex-col items-start justify-between">
+<span class="text-xs font-bold text-on-surface">3</span>
+<div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-secondary"></div></div>
+</div>
+<div class="bg-primary/5 rounded-xl p-3 flex flex-col items-start justify-between border-b-2 border-primary/20">
+<span class="text-xs font-bold text-on-surface">4</span>
+<div class="flex gap-1 flex-wrap"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-error-container"></div></div>
+</div>
+<div class="bg-primary/10 rounded-xl p-3 flex flex-col items-start justify-between">
+<span class="text-xs font-bold text-on-surface">5</span>
+<div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-primary"></div></div>
+</div>
+<div class="bg-primary/5 rounded-xl p-3 flex flex-col items-start justify-between">
+<span class="text-xs font-bold text-on-surface">6</span>
+<div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-secondary"></div></div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3 flex flex-col items-start justify-between">
+<span class="text-xs font-bold text-on-surface">7</span>
+<div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-secondary"></div></div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3">
+<span class="text-xs font-bold text-on-surface">8</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3">
+<span class="text-xs font-bold text-on-surface">9</span>
+</div>
+<!-- Row 3 (Peak Load) -->
+<div class="bg-primary/20 rounded-xl p-3 flex flex-col items-start justify-between relative group">
+<span class="text-xs font-bold text-on-surface">10</span>
+<div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-error-container"></div></div>
+</div>
+<div class="bg-primary/30 rounded-xl p-3 flex flex-col items-start justify-between">
+<span class="text-xs font-bold text-on-surface">11</span>
+<div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-primary-container"></div><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-secondary"></div></div>
+</div>
+<!-- Today Indicator -->
+<div class="bg-primary rounded-xl p-3 flex flex-col items-start justify-between shadow-lg shadow-primary/20 ring-4 ring-primary/10">
+<span class="text-xs font-bold text-on-primary">12</span>
+<span class="text-[8px] font-bold uppercase text-on-primary/80">Active</span>
+</div>
+<div class="bg-primary/20 rounded-xl p-3 flex flex-col items-start justify-between">
+<span class="text-xs font-bold text-on-surface">13</span>
+<div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-secondary"></div></div>
+</div>
+<div class="bg-primary/10 rounded-xl p-3 flex flex-col items-start justify-between">
+<span class="text-xs font-bold text-on-surface">14</span>
+<div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div></div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3">
+<span class="text-xs font-bold text-on-surface">15</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-3">
+<span class="text-xs font-bold text-on-surface">16</span>
+</div>
+<!-- Row 4-6 generated implicitly to show "Busy Month" density -->
+<div class="bg-primary/5 rounded-xl p-3 flex flex-col items-start justify-between"><span class="text-xs font-bold text-on-surface">17</span><div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div></div></div>
+<div class="bg-primary/10 rounded-xl p-3 flex flex-col items-start justify-between"><span class="text-xs font-bold text-on-surface">18</span><div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-primary"></div></div></div>
+<div class="bg-primary/20 rounded-xl p-3 flex flex-col items-start justify-between"><span class="text-xs font-bold text-on-surface">19</span><div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-error"></div></div></div>
+<div class="bg-primary/10 rounded-xl p-3 flex flex-col items-start justify-between"><span class="text-xs font-bold text-on-surface">20</span><div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div></div></div>
+<div class="bg-primary/10 rounded-xl p-3 flex flex-col items-start justify-between"><span class="text-xs font-bold text-on-surface">21</span><div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div></div></div>
+<div class="bg-surface-container-lowest rounded-xl p-3"><span class="text-xs font-bold text-on-surface">22</span></div>
+<div class="bg-surface-container-lowest rounded-xl p-3"><span class="text-xs font-bold text-on-surface">23</span></div>
+<div class="bg-primary/5 rounded-xl p-3 flex flex-col items-start justify-between"><span class="text-xs font-bold text-on-surface">24</span><div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div></div></div>
+<div class="bg-primary/30 rounded-xl p-3 flex flex-col items-start justify-between"><span class="text-xs font-bold text-on-surface">25</span><div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-primary"></div><div class="w-1.5 h-1.5 rounded-full bg-primary"></div></div></div>
+<div class="bg-primary/40 rounded-xl p-3 flex flex-col items-start justify-between"><span class="text-xs font-bold text-on-surface">26</span><div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary-dim"></div><div class="w-1.5 h-1.5 rounded-full bg-primary-dim"></div></div></div>
+<div class="bg-primary/20 rounded-xl p-3 flex flex-col items-start justify-between"><span class="text-xs font-bold text-on-surface">27</span><div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div></div></div>
+<div class="bg-primary/10 rounded-xl p-3 flex flex-col items-start justify-between"><span class="text-xs font-bold text-on-surface">28</span><div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div></div></div>
+<div class="bg-surface-container-lowest rounded-xl p-3"><span class="text-xs font-bold text-on-surface">29</span></div>
+<div class="bg-surface-container-lowest rounded-xl p-3"><span class="text-xs font-bold text-on-surface">30</span></div>
+<div class="bg-primary/10 rounded-xl p-3 flex flex-col items-start justify-between"><span class="text-xs font-bold text-on-surface">31</span><div class="flex gap-1"><div class="w-1.5 h-1.5 rounded-full bg-primary"></div></div></div>
+<div class="bg-surface-container-lowest rounded-xl p-3 opacity-40"><span class="text-xs font-medium text-on-surface-variant">1</span></div>
+<div class="bg-surface-container-lowest rounded-xl p-3 opacity-40"><span class="text-xs font-medium text-on-surface-variant">2</span></div>
+<div class="bg-surface-container-lowest rounded-xl p-3 opacity-40"><span class="text-xs font-medium text-on-surface-variant">3</span></div>
+<div class="bg-surface-container-lowest rounded-xl p-3 opacity-40"><span class="text-xs font-medium text-on-surface-variant">4</span></div>
+<div class="bg-surface-container-lowest rounded-xl p-3 opacity-40"><span class="text-xs font-medium text-on-surface-variant">5</span></div>
+<div class="bg-surface-container-lowest rounded-xl p-3 opacity-40"><span class="text-xs font-medium text-on-surface-variant">6</span></div>
+</div>
+</section>
+<!-- Right Rail (Agenda & Workload) -->
+<aside class="w-80 flex flex-col gap-6 h-full overflow-hidden">
+<!-- Heatmap Summary Card -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)] border border-white/40">
+<h3 class="font-headline font-bold text-sm mb-4">Capacity Utilization</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-xs text-on-surface-variant">Current Load</span>
+<span class="text-xs font-bold text-primary">92%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container w-[92%] rounded-full"></div>
+</div>
+<div class="grid grid-cols-5 gap-1">
+<div class="h-4 rounded-sm bg-primary/10"></div>
+<div class="h-4 rounded-sm bg-primary/20"></div>
+<div class="h-4 rounded-sm bg-primary/40"></div>
+<div class="h-4 rounded-sm bg-primary/60"></div>
+<div class="h-4 rounded-sm bg-primary"></div>
+</div>
+<p class="text-[10px] text-on-surface-variant text-center italic">Over-capacity alert: Friday 25th</p>
+</div>
+</div>
+<!-- Focused Agenda Section -->
+<div class="flex-1 flex flex-col min-h-0">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline font-bold text-sm">Today's Agenda</h3>
+<span class="text-[10px] font-bold text-primary uppercase">Oct 12</span>
+</div>
+<div class="space-y-3 overflow-y-auto pr-2 custom-scrollbar flex-1">
+<!-- Agenda Item 1 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border-l-4 border-error hover:translate-x-1 transition-transform">
+<div class="flex justify-between items-start mb-1">
+<span class="text-[10px] font-bold text-error uppercase">Urgent</span>
+<span class="text-[10px] text-on-surface-variant">09:30 AM</span>
+</div>
+<h4 class="text-sm font-bold text-on-surface leading-tight mb-2">Stakeholder Strategy Review</h4>
+<div class="flex -space-x-2">
+<img class="w-6 h-6 rounded-full border-2 border-white" data-alt="Portrait of a professional woman with a warm expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5Vy7uH16pt_yj7EP3vJnwgaGp2P8DJTNhLMLLmT_N2mx5lDdra2bz7X6U5RywqERQEAuIyxm_9XciLyFZyrVFRXnrib7dseS4mRQypZbwR3U28TgUoyRxVJ240_0DLLUA65okEGbNRyiU8eGoqfV_04Kw6kz72U_KU3d5yFn8ADinoL1hbtk2w_ulDtsCNXjuOxblbXYZ6n0F3E7oGpRWJrCEHqth2zID55AFhSSLpMY7ReupEYqlkGciH5Kzmp-PIDdkels1E3-H"/>
+<img class="w-6 h-6 rounded-full border-2 border-white" data-alt="Portrait of a man in creative attire against a minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeMRKnd-fWZYpIj44pDyQbXqudZYksB04MzZfTkK6A-OalZgexyHD-w17Rjq0ji8zdRH4DRXpNnQ3FZEhYUsuoyH-hdM8stchei81q9sBMaMTsiWP7tUGhN_rHJpNGxQuDbQdlhT4Ej_VQAnps0fbrBbRKSkj7umpi3dgt8cw7o9wBOrm5TQtO4HDxjB2UhHnSe70Ilyr54upmXYvx0b3myWSphLuSFEEQso4cJeDCE9SVbW8ijzXT1O-c7DMOvzFLefyBsGK0-8I9"/>
+<div class="w-6 h-6 rounded-full bg-surface-container-highest border-2 border-white flex items-center justify-center text-[8px] font-bold text-on-surface-variant">+3</div>
+</div>
+</div>
+<!-- Agenda Item 2 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border-l-4 border-primary-container hover:translate-x-1 transition-transform">
+<div class="flex justify-between items-start mb-1">
+<span class="text-[10px] font-bold text-primary-container uppercase">Design</span>
+<span class="text-[10px] text-on-surface-variant">11:00 AM</span>
+</div>
+<h4 class="text-sm font-bold text-on-surface leading-tight mb-2">Iconography System Audit</h4>
+<p class="text-[11px] text-on-surface-variant">Finalizing the curator-core set</p>
+</div>
+<!-- Agenda Item 3 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border-l-4 border-secondary-container hover:translate-x-1 transition-transform">
+<div class="flex justify-between items-start mb-1">
+<span class="text-[10px] font-bold text-secondary-container uppercase">Quick Catchup</span>
+<span class="text-[10px] text-on-surface-variant">02:15 PM</span>
+</div>
+<h4 class="text-sm font-bold text-on-surface leading-tight">Sync with Frontend Team</h4>
+</div>
+<!-- Agenda Item 4 (Busy Overflow) -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border-l-4 border-primary hover:translate-x-1 transition-transform">
+<div class="flex justify-between items-start mb-1">
+<span class="text-[10px] font-bold text-primary uppercase">Deep Work</span>
+<span class="text-[10px] text-on-surface-variant">04:00 PM</span>
+</div>
+<h4 class="text-sm font-bold text-on-surface leading-tight">October Report Compilation</h4>
+</div>
+</div>
+</div>
+<!-- Floating Bottom Section -->
+<div class="bg-gradient-to-br from-primary to-primary-dim p-4 rounded-2xl text-on-primary">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined text-white" data-icon="support_agent">support_agent</span>
+<span class="text-xs font-bold uppercase tracking-widest">Help Center</span>
+</div>
+<p class="text-[11px] opacity-90 leading-relaxed mb-4">You have 12 overlapping tasks this week. Would you like the Curator AI to suggest a reschedule?</p>
+<button class="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm py-2 rounded-lg text-xs font-bold transition-all">Optimize My Schedule</button>
+</div>
+</aside>
+</main>
+</div>
+<!-- Help Center Floating Rail (JSON Predicted) -->
+<div class="fixed right-4 top-1/2 -translate-y-1/2 w-20 bg-[#ebeef3]/40 dark:bg-[#1a1d21]/40 backdrop-blur-md flex flex-col gap-6 py-8 items-center rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.06)]">
+<button class="text-[#6E77D1] bg-white/80 dark:bg-black/20 rounded-xl p-3 transition-all hover:translate-x-[-4px]">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+</button>
+<button class="text-slate-400 hover:text-[#6E77D1] transition-all hover:translate-x-[-4px]">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+</button>
+<button class="text-slate-400 hover:text-[#6E77D1] transition-all hover:translate-x-[-4px]">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+</button>
+</div>
+</body></html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aura Secretary - Rules &amp; Carryover</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #0A0E17;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(182, 160, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 227, 253, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-container": "#330066",
+                        "primary-fixed": "#cabdff",
+                        "on-surface-variant": "#a7abb7",
+                        "on-secondary": "#003641",
+                        "on-secondary-container": "#c9f8ff",
+                        "on-error-container": "#ffb2b9",
+                        "inverse-surface": "#faf9ff",
+                        "inverse-primary": "#7a63d2",
+                        "inverse-on-surface": "#515560",
+                        "on-tertiary": "#11261b",
+                        "on-tertiary-container": "#0e1f15",
+                        "secondary": "#00e3fd",
+                        "surface-container-highest": "#202633",
+                        "secondary-fixed": "#00e3fd",
+                        "background": "#0a0e17",
+                        "tertiary-fixed": "#b5ffc2",
+                        "surface-container": "#151925",
+                        "on-primary": "#420082",
+                        "on-primary-fixed": "#000000",
+                        "surface-container-lowest": "#000000",
+                        "on-secondary-fixed-variant": "#005462",
+                        "secondary-fixed-dim": "#38cde0",
+                        "outline": "#727581",
+                        "surface-dim": "#0a0e17",
+                        "error": "#ff6e84",
+                        "on-tertiary-fixed-variant": "#1d3b2a",
+                        "secondary-container": "#004b58",
+                        "primary-dim": "#8a70f0",
+                        "primary-fixed-dim": "#a18cff",
+                        "primary": "#b6a0ff",
+                        "surface-tint": "#b6a0ff",
+                        "surface-variant": "#202633",
+                        "outline-variant": "#444852",
+                        "on-secondary-fixed": "#002931",
+                        "surface-container-high": "#1a1f2c",
+                        "tertiary": "#b5ffc2",
+                        "error-container": "#a70138",
+                        "surface": "#0a0e17",
+                        "surface-bright": "#262c3a",
+                        "primary-container": "#cabdff",
+                        "tertiary-container": "#6bd987",
+                        "tertiary-fixed-dim": "#9af0ad",
+                        "tertiary-dim": "#b5ffc2",
+                        "on-background": "#ebedfb",
+                        "on-tertiary-fixed": "#0a190f",
+                        "on-error": "#490013",
+                        "surface-container-low": "#0f131d",
+                        "on-surface": "#ebedfb",
+                        "secondary-dim": "#38cde0",
+                        "on-primary-fixed-variant": "#3f007c",
+                        "error-dim": "#d73357"
+                    },
+                    fontFamily: {
+                        headline: ["Manrope"],
+                        body: ["Manrope"],
+                        label: ["Manrope"]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="../aetheris_prime/celestial-glass.css" rel="stylesheet"/>
+</head>
+<body class="text-on-surface font-body overflow-hidden h-screen select-none">
+<div class="noise-overlay"></div>
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center h-16 px-6 bg-[#0A0E17]/40 backdrop-blur-xl border-b border-white/10 shadow-[0_0_40px_rgba(182, 160, 255,0.1)]">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold bg-gradient-to-r from-[#b6a0ff] to-[#b5ffc2] bg-clip-text text-transparent font-headline tracking-tight">Aura Secretary</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-[#A7ABB7] hover:bg-white/5 transition-all duration-300 px-3 py-1 rounded-lg font-manrope font-semibold" href="#">Dashboard</a>
+<a class="text-[#b6a0ff] border-b-2 border-[#b6a0ff] px-3 py-1 font-manrope font-semibold" href="#">Tasks</a>
+<a class="text-[#A7ABB7] hover:bg-white/5 transition-all duration-300 px-3 py-1 rounded-lg font-manrope font-semibold" href="#">Intelligence</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-[#A7ABB7] hover:text-white hover:bg-white/5 rounded-full transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-[#A7ABB7] hover:text-white hover:bg-white/5 rounded-full transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+</button>
+<button class="p-2 text-[#A7ABB7] hover:text-white hover:bg-white/5 rounded-full transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</nav>
+<!-- SideNavBar (Left) -->
+<aside class="fixed left-0 top-0 h-screen w-16 bg-[#0F131D]/60 backdrop-blur-2xl border-r border-white/10 flex flex-col items-center py-8 gap-8 z-40 pt-24">
+<div class="flex flex-col items-center gap-8">
+<button class="p-3 text-[#A7ABB7] hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</button>
+<button class="p-3 text-[#A7ABB7] hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</button>
+<button class="p-3 text-[#b6a0ff] bg-[#202633]/40 rounded-xl">
+<span class="material-symbols-outlined fill-icon" data-icon="check_circle">check_circle</span>
+</button>
+<button class="p-3 text-[#A7ABB7] hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+</button>
+<button class="p-3 text-[#A7ABB7] hover:text-white transition-colors mt-auto">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pl-16 pr-80 pt-16 h-screen flex flex-col overflow-hidden relative">
+<div class="p-8 h-full">
+<header class="mb-8 flex justify-between items-end">
+<div>
+<h1 class="text-4xl font-headline font-extrabold tracking-tight text-on-surface">Rules &amp; Carryover</h1>
+<p class="text-on-surface-variant mt-2 font-body">Optimize your celestial timeline and handle pending echoes.</p>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2 rounded-xl bg-surface-variant/40 border border-white/10 text-on-surface-variant flex items-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="history">history</span>
+                        View History
+                    </button>
+<button class="px-6 py-2 rounded-xl bg-gradient-to-r from-primary to-primary-dim text-on-primary-container font-semibold shadow-[0_0_20px_rgba(182, 160, 255,0.3)] hover:scale-105 active:scale-95 transition-transform">
+                        Commit Schedule
+                    </button>
+</div>
+</header>
+<!-- Bento Layout -->
+<div class="grid grid-cols-12 grid-rows-6 gap-6 h-[calc(100%-8rem)]">
+<!-- Carryover Pool (Priority Quadrant) -->
+<section class="col-span-7 row-span-4 bg-surface-container-low/40 backdrop-blur-xl rounded-3xl border border-white/5 p-6 flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] -mr-32 -mt-32"></div>
+<div class="flex items-center justify-between mb-6 z-10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" data-icon="pending_actions">pending_actions</span>
+<h2 class="text-xl font-headline font-bold text-on-surface">Carryover Pool</h2>
+</div>
+<span class="px-3 py-1 bg-secondary/10 text-secondary text-xs font-mono rounded-full uppercase tracking-widest border border-secondary/20">3 Tasks Delayed</span>
+</div>
+<div class="flex-1 overflow-y-auto pr-2 no-scrollbar space-y-4 z-10">
+<!-- Delayed Task Card 1 -->
+<div class="group bg-surface-container/60 hover:bg-surface-container transition-all duration-500 rounded-2xl p-5 border border-white/5 hover:border-primary/20 cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-lg font-semibold text-white group-hover:text-primary transition-colors">Deep Research: Project Aurora</h3>
+<div class="flex items-center gap-2 mt-1 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-xs" data-icon="schedule">schedule</span>
+<span>Was due: Yesterday, 14:00</span>
+</div>
+</div>
+<div class="bg-error/10 text-error px-3 py-1 rounded-lg text-xs font-medium border border-error/20">Overdue</div>
+</div>
+<div class="flex gap-4 items-center mb-4">
+<div class="flex-1 bg-surface-container-highest rounded-xl p-3 border border-white/5">
+<span class="text-[10px] uppercase tracking-wider text-on-surface-variant block mb-1">Delay Reason</span>
+<p class="text-sm italic">"High cognitive load from morning syncs."</p>
+</div>
+<div class="material-symbols-outlined text-outline-variant" data-icon="arrow_forward">arrow_forward</div>
+<div class="flex-1 bg-primary/5 rounded-xl p-3 border border-primary/10">
+<span class="text-[10px] uppercase tracking-wider text-primary block mb-1">Recommended Slot</span>
+<p class="text-sm font-semibold text-primary-fixed">Today, 10:30 (Deep Work)</p>
+</div>
+</div>
+<div class="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-xs text-on-surface-variant hover:text-white">Ignore</button>
+<button class="bg-primary/20 text-primary px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-primary/30">Auto-Apply Slot</button>
+</div>
+</div>
+<!-- Delayed Task Card 2 -->
+<div class="group bg-surface-container/60 hover:bg-surface-container transition-all duration-500 rounded-2xl p-5 border border-white/5 hover:border-primary/20 cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-lg font-semibold text-white group-hover:text-primary transition-colors">Quarterly Review Deck</h3>
+<div class="flex items-center gap-2 mt-1 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-xs" data-icon="schedule">schedule</span>
+<span>Was due: Today, 08:00</span>
+</div>
+</div>
+<div class="bg-secondary/10 text-secondary px-3 py-1 rounded-lg text-xs font-medium border border-secondary/20">Auto-Bumping</div>
+</div>
+<div class="flex gap-4 items-center mb-4">
+<div class="flex-1 bg-surface-container-highest rounded-xl p-3 border border-white/5">
+<span class="text-[10px] uppercase tracking-wider text-on-surface-variant block mb-1">Delay Reason</span>
+<p class="text-sm italic">"Sleep cycle extended for recovery."</p>
+</div>
+<div class="material-symbols-outlined text-outline-variant" data-icon="arrow_forward">arrow_forward</div>
+<div class="flex-1 bg-primary/5 rounded-xl p-3 border border-primary/10">
+<span class="text-[10px] uppercase tracking-wider text-primary block mb-1">Recommended Slot</span>
+<p class="text-sm font-semibold text-primary-fixed">Tomorrow, 09:00</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Rules Editor (Sleep/Wake) -->
+<section class="col-span-5 row-span-3 bg-surface-container-low/40 backdrop-blur-xl rounded-3xl border border-white/5 p-6 flex flex-col">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-tertiary" data-icon="bedtime">bedtime</span>
+<h2 class="text-xl font-headline font-bold text-on-surface">Circadian Rhythm</h2>
+</div>
+<div class="space-y-6">
+<!-- Sleep Cycle -->
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-surface-container rounded-2xl border-b-2 border-transparent focus-within:border-secondary transition-all">
+<label class="text-[10px] uppercase tracking-widest text-on-surface-variant block mb-2 font-semibold">Wake-Up Time</label>
+<div class="flex items-center gap-3">
+<span class="text-3xl font-headline font-bold text-secondary">06:30</span>
+<button class="material-symbols-outlined text-outline text-lg" data-icon="edit">edit</button>
+</div>
+</div>
+<div class="p-4 bg-surface-container rounded-2xl border-b-2 border-transparent focus-within:border-secondary transition-all">
+<label class="text-[10px] uppercase tracking-widest text-on-surface-variant block mb-2 font-semibold">Wind-Down</label>
+<div class="flex items-center gap-3">
+<span class="text-3xl font-headline font-bold text-tertiary">22:00</span>
+<button class="material-symbols-outlined text-outline text-lg" data-icon="edit">edit</button>
+</div>
+</div>
+</div>
+<!-- Fixed Blocks -->
+<div>
+<label class="text-[10px] uppercase tracking-widest text-on-surface-variant block mb-3 font-semibold">Fixed Commitments</label>
+<div class="space-y-2">
+<div class="flex items-center justify-between p-3 bg-surface-container rounded-xl border border-white/5">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<span class="text-sm font-medium">Advanced Astrophysics</span>
+</div>
+<span class="text-xs text-on-surface-variant">Mon, Wed • 13:00 - 14:30</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container rounded-xl border border-white/5">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-sm font-medium">Daily Fitness Core</span>
+</div>
+<span class="text-xs text-on-surface-variant">Daily • 07:00 - 08:00</span>
+</div>
+<button class="w-full py-2 border border-dashed border-outline-variant rounded-xl text-xs text-on-surface-variant hover:text-white transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xs" data-icon="add">add</span>
+                                    Add Fixed Rule
+                                </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Watching Preferences (Floating Bento) -->
+<section class="col-span-5 row-span-3 bg-surface-container-low/40 backdrop-blur-xl rounded-3xl border border-white/5 p-6">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary" data-icon="visibility">visibility</span>
+<h2 class="text-xl font-headline font-bold text-on-surface">Attention Watching</h2>
+</div>
+<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">
+                        Aura will actively monitor your focus patterns and trigger alerts based on these criteria.
+                    </p>
+<div class="space-y-4">
+<div class="flex items-center justify-between group">
+<span class="text-sm font-medium">Deep Work Silencing</span>
+<div class="w-10 h-5 bg-primary/20 rounded-full p-1 flex items-center justify-end">
+<div class="w-3 h-3 bg-primary rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between group">
+<span class="text-sm font-medium">Post-Midnight Guard</span>
+<div class="w-10 h-5 bg-primary/20 rounded-full p-1 flex items-center justify-end">
+<div class="w-3 h-3 bg-primary rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center justify-between group opacity-50">
+<span class="text-sm font-medium">Social Media Limiter</span>
+<div class="w-10 h-5 bg-surface-container-highest rounded-full p-1 flex items-center justify-start">
+<div class="w-3 h-3 bg-outline rounded-full"></div>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-white/5">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-xs text-on-secondary" data-icon="info">info</span>
+<span class="text-[10px] uppercase font-bold text-on-secondary">Current Focus Level</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-gradient-to-r from-secondary to-primary w-[78%] h-full"></div>
+</div>
+<div class="flex justify-between mt-2 text-[10px] text-on-surface-variant font-mono">
+<span>RECOVERY</span>
+<span>PEAK PERFORMANCE</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Insight (Bottom) -->
+<section class="col-span-7 row-span-2 bg-gradient-to-br from-surface-container-high to-surface-container-low rounded-3xl border border-white/5 p-6 flex gap-6 items-center">
+<div class="w-24 h-24 rounded-2xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-4xl text-secondary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div>
+<h3 class="text-lg font-headline font-bold text-white mb-1">The Aura Insight</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+                            "By delaying the <span class="text-primary font-semibold">Quarterly Review Deck</span> to tomorrow, I've reclaimed 2 hours of peak cognitive energy for your <span class="text-secondary font-semibold">Deep Research</span> session today. This aligns with your goal of high-intensity focus before 12:00."
+                        </p>
+<div class="flex gap-4 mt-3">
+<span class="text-[10px] text-secondary font-mono flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="trending_up">trending_up</span>
+                                +14% PRODUCTIVITY PREDICTED
+                            </span>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Context Rail (Right) -->
+<aside class="fixed right-0 top-0 h-screen w-80 bg-[#0A0E17]/80 backdrop-blur-xl border-l border-white/10 flex flex-col p-6 z-40">
+<div class="mb-8">
+<h2 class="text-sm font-body text-[#00e3fd] uppercase tracking-widest font-bold mb-1">Context Rail</h2>
+<p class="text-xs text-[#A7ABB7]">AI Insights &amp; Active Nodes</p>
+</div>
+<div class="space-y-8 overflow-y-auto no-scrollbar">
+<!-- Active Node Card -->
+<div class="p-5 rounded-2xl bg-surface-container-high border border-white/10">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="psychology">psychology</span>
+</div>
+<div>
+<p class="text-xs font-bold text-white uppercase tracking-tight">Active Context</p>
+<p class="text-[10px] text-on-surface-variant">Task: Scheduling Rules</p>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex gap-2">
+<div class="w-1 h-full bg-primary/30 rounded-full"></div>
+<p class="text-xs leading-relaxed text-on-surface-variant italic">
+                            "Balancing your carryover pool is critical for maintaining streak velocity."
+                        </p>
+</div>
+</div>
+</div>
+<!-- Tab Buttons -->
+<nav class="flex flex-col gap-2">
+<button class="flex items-center gap-4 p-3 text-[#00e3fd] font-bold border-l-2 border-[#00e3fd] bg-[#00e3fd]/5">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+<span>Summary</span>
+</button>
+<button class="flex items-center gap-4 p-3 text-[#A7ABB7] hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined" data-icon="extension">extension</span>
+<span>Context</span>
+</button>
+<button class="flex items-center gap-4 p-3 text-[#A7ABB7] hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span>History</span>
+</button>
+</nav>
+<!-- Memory Threads -->
+<div>
+<h3 class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-4">Related Echoes</h3>
+<div class="space-y-4">
+<div class="flex gap-3 group cursor-pointer">
+<img alt="Aurora Context" class="w-12 h-12 rounded-lg object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all" data-alt="abstract cosmic satellite image of Earth at night with glowing city lights and atmospheric nebulosity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaxiiQkwuUwp3d_2Tywc8nz81aZt4dZXTvMWEQwZntcEg0tH43340CX7wwYA-a6bTF4QG5c1QgU_aXI4szAz-xSASlN-twNsMJ9y9Bov7Rd3SHTFJfbUjlP5aPv0FZP99gAec-NxNyLqb7jomwtIOq33-Uv0Wh_Fek6BGKQ8rn6ZTQgvGIPq90bVV9fVwCgbVGvI8gWx_XDbl_RcvDIalla75pAgLXUfDrIrIG7JDSIjPDVlvzhEw17GWjNNpK8L6ab-z35iyUIEAX"/>
+<div>
+<p class="text-xs font-semibold text-on-surface group-hover:text-secondary transition-colors">Satellite Comms</p>
+<p class="text-[10px] text-on-surface-variant">Mentioned in: Project Aurora Briefing</p>
+</div>
+</div>
+<div class="flex gap-3 group cursor-pointer">
+<img alt="Setup Context" class="w-12 h-12 rounded-lg object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all" data-alt="dark desk setup with futuristic neon glowing keyboard and computer screen reflecting purple light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPAxTiLWNmgUU-ULSrj12i60mM6LM6uSy-tAq2HsWxkRPi9CLREZr_JGZYA4SI5EtPXvyF-ilm60Oy21PB3aKZAFSUC9GXJ4cUf90AV2uvXzL-yMqbloWXxJcnRKpDkG4U8GuG4BpQmKxR7tJ0marNtzsG7-qGysTDZ3cFxtKb-c3W4UtoIIYpy93W5PtJSF5IPrIu1x9IoZdlZRy9GJ6wFWWiK-0ybF3DC11QtuimYSYKWcKTL77t-G6snY0dB5NYNf0GVf7pFI0Y"/>
+<div>
+<p class="text-xs font-semibold text-on-surface group-hover:text-secondary transition-colors">Late Night Setup</p>
+<p class="text-[10px] text-on-surface-variant">Linked via: Sleep Cycle Exception</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- FAB (Suppressed on this transactional-adjacent screen per rules, but included if needed as anchor) -->
+</body></html>

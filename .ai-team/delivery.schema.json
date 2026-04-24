@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Team Delivery Result",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["done", "needs_more_rounds", "blocked", "max_rounds_reached"]
+    },
+    "task_file": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "rounds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "round": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": ["done", "needs_more_rounds", "blocked", "unknown"]
+          },
+          "summary": {
+            "type": "string"
+          },
+          "final_message_path": {
+            "type": "string"
+          },
+          "stdout_path": {
+            "type": "string"
+          },
+          "stderr_path": {
+            "type": "string"
+          }
+        },
+        "required": ["round", "status", "summary", "final_message_path", "stdout_path", "stderr_path"]
+      }
+    }
+  },
+  "required": ["status", "task_file", "generated_at", "rounds"]
+}

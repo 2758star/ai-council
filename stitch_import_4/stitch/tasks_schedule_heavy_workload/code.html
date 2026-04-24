@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Curator Pro - Tasks &amp; Schedule</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#6e0523",
+                        "primary-fixed-dim": "#8891ed",
+                        "secondary-container": "#b6eded",
+                        "inverse-primary": "#959efc",
+                        "surface-tint": "#4e57ae",
+                        "secondary-fixed-dim": "#a8dedf",
+                        "inverse-on-surface": "#9b9da0",
+                        "on-primary": "#fbf8ff",
+                        "secondary-dim": "#245b5c",
+                        "on-tertiary-fixed-variant": "#625970",
+                        "background": "#f8f9fc",
+                        "surface-container": "#ebeef3",
+                        "secondary": "#316768",
+                        "outline-variant": "#adb3b8",
+                        "surface-variant": "#dee3e9",
+                        "tertiary-dim": "#584f65",
+                        "on-surface-variant": "#5a6065",
+                        "on-tertiary-fixed": "#463d53",
+                        "tertiary-fixed": "#ede0fc",
+                        "tertiary-container": "#ede0fc",
+                        "surface-bright": "#f8f9fc",
+                        "on-background": "#2d3338",
+                        "error-container": "#f97386",
+                        "primary-dim": "#414aa1",
+                        "error-dim": "#6b0221",
+                        "on-error": "#fff7f7",
+                        "on-secondary-container": "#225a5b",
+                        "surface": "#f8f9fc",
+                        "on-primary-fixed-variant": "#1c257d",
+                        "primary-container": "#959efc",
+                        "tertiary-fixed-dim": "#dfd2ed",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#a8364b",
+                        "on-secondary-fixed": "#074748",
+                        "outline": "#767b81",
+                        "tertiary": "#645b72",
+                        "primary-fixed": "#959efc",
+                        "primary": "#4e57ae",
+                        "surface-dim": "#d5dbe1",
+                        "on-surface": "#2d3338",
+                        "surface-container-high": "#e4e8ee",
+                        "on-tertiary": "#fef7ff",
+                        "surface-container-highest": "#dee3e9",
+                        "on-secondary": "#e0ffff",
+                        "on-primary-container": "#101974",
+                        "on-primary-fixed": "#000129",
+                        "on-tertiary-container": "#584f66",
+                        "on-secondary-fixed-variant": "#2d6465",
+                        "surface-container-low": "#f1f4f8",
+                        "inverse-surface": "#0c0f11",
+                        "secondary-fixed": "#b6eded"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fc; color: #2d3338; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-effect { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(24px); }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar (Workspace) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-[#ebeef3] flex flex-col py-6 px-4 z-50">
+<div class="mb-10 px-2">
+<h2 class="font-headline text-lg font-extrabold text-[#6E77D1] tracking-tighter">Curator Pro</h2>
+<p class="text-xs text-slate-500 font-medium tracking-wide mt-1 uppercase">Premium Edition</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-[#6E77D1] font-bold border-r-2 border-[#6E77D1] bg-white/40 font-body text-sm transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-white/40 font-body text-sm transition-all group" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span>Projects</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-white/40 font-body text-sm transition-all group" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Insights</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-white/40 font-body text-sm transition-all group" href="#">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+<span>Library</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-white/40 font-body text-sm transition-all group" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Team</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-white/40 font-body text-sm transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+<span>Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-white/40 font-body text-sm transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+<span>Trash</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-64 mr-24">
+<!-- TopAppBar -->
+<header class="w-full h-16 sticky top-0 z-40 bg-[#f8f9fc] flex justify-between items-center px-8 font-headline font-semibold tracking-tight">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined" data-icon="search">search</span>
+<input class="w-full bg-[#ebeef3] border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search tasks, meetings, or files..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-slate-500">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors" data-icon="settings">settings</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors" data-icon="help">help</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden ring-2 ring-white shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of a professional man in a minimalist setting with soft side lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdOTGLU-ON0E_NIVLeAEFeO8HiXstKU3XJeajR4x4VRyznHIBgxa8svnq5grVtzROEOKfvtt4ayV_K7azoMkLVolYlyjXfjmolJOLgg8rcu7h8sL9uYqo5RjNBHjxDMwxluq9k9d5jGOHS_DAjaMPPCwXMwsUpM8B4srlcpIta5BlKBKiOmfVVTmt9PHP2T-ogjmVlgk7-l0H9QnkGjYMWOwcmRj4YKymJ9_nuCqX_hjAvI2ZS_IJFsNfw1E0PZYVDj0Xb_8AJHR0m"/>
+</div>
+</div>
+</header>
+<section class="p-8 space-y-6">
+<!-- Header Section -->
+<div class="flex items-end justify-between">
+<div>
+<h1 class="font-headline text-4xl font-extrabold tracking-tight text-on-background">Capacity Overview</h1>
+<p class="text-on-surface-variant font-body mt-1">Status: <span class="text-error font-semibold">Critical Workload (92%)</span> — 14 pending deliverables for today.</p>
+</div>
+<div class="flex gap-2">
+<button class="bg-surface-container-high px-4 py-2 rounded-lg text-sm font-semibold hover:bg-surface-container-highest transition-colors">Export Report</button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:opacity-90 transition-opacity">Schedule Sync</button>
+</div>
+</div>
+<!-- Bento Grid - Heatmap & Priorities -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Heatmap Activity (Restrained tones) -->
+<div class="col-span-8 bg-surface-container-lowest rounded-xl p-6 shadow-sm border-none">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline text-lg font-bold">Execution Heatmap</h3>
+<div class="flex items-center gap-4 text-xs font-medium text-on-surface-variant"><span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-surface-container"></span>Low</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary-container/40"></span>Mid</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary"></span>Peak</span></div>
+</div>
+<div class="grid grid-cols-7 gap-2"><!-- Mon -->
+<div class="space-y-2">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant block mb-2 font-bold">Mon</span>
+<div class="h-10 bg-primary-container/30 rounded-md"></div>
+<div class="h-10 bg-primary-container/20 rounded-md"></div>
+<div class="h-10 bg-surface-container rounded-md"></div>
+<div class="h-10 bg-primary/20 rounded-md"></div>
+</div>
+<!-- Tue -->
+<div class="space-y-2">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant block mb-2 font-bold">Tue</span>
+<div class="h-10 bg-primary/10 rounded-md"></div>
+<div class="h-10 bg-primary/40 rounded-md"></div>
+<div class="h-10 bg-primary-container/40 rounded-md"></div>
+<div class="h-10 bg-primary-container/20 rounded-md"></div>
+</div>
+<!-- Wed -->
+<div class="space-y-2">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant block mb-2 font-bold">Wed</span>
+<div class="h-10 bg-primary/50 rounded-md"></div>
+<div class="h-10 bg-primary/30 rounded-md"></div>
+<div class="h-10 bg-primary/60 rounded-md"></div>
+<div class="h-10 bg-primary/20 rounded-md"></div>
+</div>
+<!-- Today -->
+<div class="space-y-2">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant block mb-2 font-bold text-[#6E77D1]">Today</span>
+<div class="h-10 bg-[#6E77D1] rounded-md ring-2 ring-[#6E77D1] ring-offset-2"></div>
+<div class="h-10 bg-primary/50 rounded-md"></div>
+<div class="h-10 bg-primary/40 rounded-md"></div>
+<div class="h-10 bg-primary/80 rounded-md"></div>
+</div>
+<!-- Fri -->
+<div class="space-y-2">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant block mb-2 font-bold">Fri</span>
+<div class="h-10 bg-primary-container/40 rounded-md"></div>
+<div class="h-10 bg-primary/30 rounded-md"></div>
+<div class="h-10 bg-primary-container/20 rounded-md"></div>
+<div class="h-10 bg-surface-container rounded-md"></div>
+</div>
+<!-- Sat -->
+<div class="space-y-2">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant block mb-2 font-bold">Sat</span>
+<div class="h-10 bg-surface-container rounded-md"></div>
+<div class="h-10 bg-surface-container rounded-md"></div>
+<div class="h-10 bg-surface-container/50 rounded-md"></div>
+<div class="h-10 bg-surface-container/30 rounded-md"></div>
+</div>
+<!-- Sun -->
+<div class="space-y-2">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant block mb-2 font-bold">Sun</span>
+<div class="h-10 bg-surface-container/30 rounded-md"></div>
+<div class="h-10 bg-surface-container/20 rounded-md"></div>
+<div class="h-10 bg-surface-container/10 rounded-md"></div>
+<div class="h-10 bg-surface-container/5 rounded-md"></div>
+</div></div>
+</div>
+<!-- Priority Stack -->
+<div class="col-span-4 bg-surface-container rounded-xl p-6 shadow-sm border-none flex flex-col">
+<h3 class="font-headline text-lg font-bold mb-4">Must Do Priorities</h3>
+<div class="space-y-3 overflow-y-auto no-scrollbar max-h-[220px]">
+<div class="bg-surface-container-lowest p-3 rounded-lg flex items-start gap-3 border-none">
+<span class="material-symbols-outlined text-error text-sm mt-0.5" data-icon="report">report</span>
+<div>
+<p class="text-xs font-bold text-on-background">Q3 Financial Audit Submission</p>
+<p class="text-[10px] text-on-surface-variant">Due in 2 hours • High Stake</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded-lg flex items-start gap-3 border-none">
+<span class="material-symbols-outlined text-error text-sm mt-0.5" data-icon="report">report</span>
+<div>
+<p class="text-xs font-bold text-on-background">Client Response: Nexus Project</p>
+<p class="text-[10px] text-on-surface-variant">SLA Breach approaching</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded-lg flex items-start gap-3 border-none">
+<span class="material-symbols-outlined text-error text-sm mt-0.5" data-icon="report">report</span>
+<div>
+<p class="text-xs font-bold text-on-background">Infrastructure Patching</p>
+<p class="text-[10px] text-on-surface-variant">Urgent Security Update</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded-lg flex items-start gap-3 border-none">
+<span class="material-symbols-outlined text-error text-sm mt-0.5" data-icon="report">report</span>
+<div>
+<p class="text-xs font-bold text-on-background">Talent Acquisition Sync</p>
+<p class="text-[10px] text-on-surface-variant">Critical hiring milestone</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Dense Calendar Block -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex h-[400px]">
+<!-- Time Column -->
+<div class="w-16 bg-surface-container-low border-r border-outline-variant/10 flex flex-col py-4 items-center gap-[4.7rem]">
+<span class="text-[10px] font-bold text-slate-400">08:00</span>
+<span class="text-[10px] font-bold text-slate-400">09:00</span>
+<span class="text-[10px] font-bold text-slate-400">10:00</span>
+<span class="text-[10px] font-bold text-slate-400">11:00</span>
+<span class="text-[10px] font-bold text-slate-400">12:00</span>
+</div>
+<!-- Main Schedule View -->
+<div class="flex-1 relative p-4 bg-white">
+<div class="absolute inset-x-4 top-[4.5rem] border-t border-outline-variant/10 w-full"></div>
+<div class="absolute inset-x-4 top-[9.5rem] border-t border-outline-variant/10 w-full"></div>
+<div class="absolute inset-x-4 top-[14.5rem] border-t border-outline-variant/10 w-full"></div>
+<div class="absolute inset-x-4 top-[19.5rem] border-t border-outline-variant/10 w-full"></div>
+<!-- Dense Event Blocks -->
+<div class="grid grid-cols-1 gap-2 pt-2">
+<div class="bg-primary/5 rounded-lg p-3 flex flex-col justify-center border-l-4 border-primary">
+<p class="text-xs font-bold text-primary">Strategic Planning Session</p>
+<p class="text-[10px] text-on-primary-container/70">08:00 - 09:30 • Conference Room A</p>
+</div>
+<div class="flex gap-2 h-20">
+<div class="flex-1 bg-secondary-container/20 rounded-lg p-3 flex flex-col justify-center border-l-4 border-secondary">
+<p class="text-xs font-bold text-secondary">UX Review: Dashboard v4</p>
+<p class="text-[10px] text-secondary">09:30 - 10:15</p>
+</div>
+<div class="flex-1 bg-tertiary-container/20 rounded-lg p-3 flex flex-col justify-center border-l-4 border-tertiary">
+<p class="text-xs font-bold text-tertiary">Vendor Contract Briefing</p>
+<p class="text-[10px] text-tertiary">09:45 - 10:15</p>
+</div>
+</div>
+<div class="bg-error-container/10 rounded-lg p-3 flex flex-col justify-center border-l-4 border-error h-24">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold text-error">CRITICAL: Emergency Server Maintenance</p>
+<p class="text-[10px] text-error/80">10:30 - 12:00 • DevOps War Room</p>
+</div>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border-2 border-white bg-slate-300"></div>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-slate-400"></div>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-slate-500"></div>
+</div>
+</div>
+</div>
+<div class="bg-primary/5 rounded-lg p-3 flex flex-col justify-center border-l-4 border-primary-dim">
+<p class="text-xs font-bold text-primary-dim">Lunch Break &amp; Networking</p>
+<p class="text-[10px] text-primary-dim/60">12:00 - 13:00</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Right Rail - Help Center & Support -->
+<aside class="w-20 fixed right-4 top-1/2 -translate-y-1/2 rounded-2xl bg-[#ebeef3]/40 backdrop-blur-md flex flex-col gap-6 py-8 items-center shadow-[0_8px_32px_rgba(0,0,0,0.06)] z-50">
+<a class="text-slate-400 hover:text-[#6E77D1] transition-all hover:translate-x-[-4px]" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="support_agent">support_agent</span>
+</a>
+<a class="text-[#6E77D1] bg-white/80 dark:bg-black/20 p-2 rounded-xl transition-all hover:translate-x-[-4px]" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="forum">forum</span>
+</a>
+<a class="text-slate-400 hover:text-[#6E77D1] transition-all hover:translate-x-[-4px]" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="menu_book">menu_book</span>
+</a>
+</aside>
+<!-- Floating Action Button - Supressed as per context (Details/Transactional Screen), but adding Task Creator for high-density workflow if permitted by common sense, otherwise following strict suppression -->
+<!-- Suppressed based on rule: "suppress the FAB on Settings, Profile, Details, and Transactional screens." -->
+</body></html>

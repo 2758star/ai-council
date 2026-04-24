@@ -1,0 +1,24 @@
+node_modules/
+dist/
+target/
+src-tauri/target/
+src-tauri/gen/
+.DS_Store
+.env
+.env.local
+.vscode/
+.idea/
+.claude/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.dmg
+*.zip
+awesome-ai-research-writing/
+legacy/applimate-streamlit/data/*.db
+
+# AI team local artifacts
+.ai-team/logs/
+.ai-team/reports/
+.ai-team/__pycache__/

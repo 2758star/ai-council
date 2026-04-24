@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aetheris Prime | Knowledge Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#1d3b2a",
+                        "primary-dim": "#8a70f0",
+                        "on-surface": "#ebedfb",
+                        "primary-fixed-dim": "#a18cff",
+                        "on-tertiary-container": "#0e1f15",
+                        "surface-container-highest": "#202633",
+                        "surface-variant": "#202633",
+                        "error-container": "#a70138",
+                        "on-surface-variant": "#a7abb7",
+                        "primary": "#b6a0ff",
+                        "on-primary": "#420082",
+                        "error-dim": "#d73357",
+                        "on-secondary-container": "#c9f8ff",
+                        "on-primary-fixed": "#000000",
+                        "on-primary-container": "#330066",
+                        "on-error": "#490013",
+                        "on-secondary-fixed-variant": "#005462",
+                        "on-secondary": "#003641",
+                        "tertiary-dim": "#b5ffc2",
+                        "outline-variant": "#444852",
+                        "secondary-container": "#004b58",
+                        "outline": "#727581",
+                        "surface-container-lowest": "#000000",
+                        "secondary": "#00e3fd",
+                        "surface-dim": "#0a0e17",
+                        "secondary-fixed": "#00e3fd",
+                        "inverse-on-surface": "#515560",
+                        "primary-container": "#cabdff",
+                        "surface-tint": "#b6a0ff",
+                        "surface-container-high": "#1a1f2c",
+                        "primary-fixed": "#cabdff",
+                        "on-secondary-fixed": "#002931",
+                        "on-background": "#ebedfb",
+                        "background": "#0a0e17",
+                        "on-primary-fixed-variant": "#3f007c",
+                        "tertiary-fixed-dim": "#9af0ad",
+                        "secondary-fixed-dim": "#38cde0",
+                        "tertiary-container": "#6bd987",
+                        "on-error-container": "#ffb2b9",
+                        "on-tertiary": "#11261b",
+                        "surface": "#0a0e17",
+                        "tertiary-fixed": "#b5ffc2",
+                        "secondary-dim": "#38cde0",
+                        "error": "#ff6e84",
+                        "surface-bright": "#262c3a",
+                        "inverse-surface": "#faf9ff",
+                        "on-tertiary-fixed": "#0a190f",
+                        "tertiary": "#b5ffc2",
+                        "inverse-primary": "#7a63d2",
+                        "surface-container-low": "#0f131d",
+                        "surface-container": "#151925"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.75rem",
+                        "lg": "0.75rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0E17;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(182, 160, 255, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 227, 253, 0.1) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(181, 255, 194, 0.1) 0px, transparent 50%);
+            overflow: hidden;
+            height: 100vh;
+        }
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .miller-column::-webkit-scrollbar {
+            width: 4px;
+        }
+        .miller-column::-webkit-scrollbar-thumb {
+            background: rgba(167, 171, 183, 0.2);
+            border-radius: 10px;
+        }
+        .glass-panel {
+            backdrop-filter: blur(24px);
+            background: rgba(32, 38, 51, 0.4);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<link href="../aetheris_prime/celestial-glass.css" rel="stylesheet"/>
+</head>
+<body class="font-body text-on-surface">
+<div class="noise-overlay"></div>
+<!-- SideNavBar (Anchor) -->
+<aside class="fixed left-0 top-0 h-full w-64 border-r border-white/10 bg-[#0A0E17]/80 backdrop-blur-2xl flex flex-col h-full py-6 px-4 z-50">
+<div class="flex items-center gap-3 mb-10 px-2">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dim flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-on-primary">star_half</span>
+</div>
+<div>
+<h2 class="text-violet-300 font-manrope font-bold text-lg leading-none">Aetheris</h2>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-medium">Celestial Concierge</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:translate-x-1 transition-all rounded-xl font-body text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="view_kanban">view_kanban</span>
+                Applications
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:translate-x-1 transition-all rounded-xl font-body text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="view_timeline">view_timeline</span>
+                Tasks
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-violet-500/20 text-violet-300 rounded-xl border-l-4 border-violet-500 font-body text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+                Library
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:translate-x-1 transition-all rounded-xl font-body text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="center_focus_strong">center_focus_strong</span>
+                Focus
+            </a>
+</nav>
+<div class="mt-auto pt-6 border-t border-white/10 space-y-2">
+<button class="w-full bg-gradient-to-r from-primary to-primary-dim text-on-primary font-bold py-3 rounded-xl mb-4 hover:scale-105 transition-transform text-sm shadow-lg shadow-primary/10">
+                New Entry
+            </button>
+<a class="flex items-center gap-3 px-4 py-2 text-slate-400 hover:text-white transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="help_outline">help_outline</span>
+                Support
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-slate-400 hover:text-white transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 h-screen flex flex-col relative overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-64 z-40 bg-transparent backdrop-blur-xl flex justify-between items-center px-8 py-4 w-full">
+<div class="flex items-center gap-6">
+<h1 class="font-headline text-2xl font-black text-white italic tracking-tighter">Knowledge</h1>
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-on-surface-variant group-focus-within:text-secondary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="search">search</span>
+</span>
+<input class="bg-surface-container-low border-0 border-b border-white/10 focus:border-secondary focus:ring-0 text-sm pl-10 pr-4 py-2 rounded-lg w-80 transition-all placeholder:text-on-surface-variant/50" placeholder="Search Library..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white hover:scale-105 transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white hover:scale-105 transition-all">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full border-2 border-violet-500/30 overflow-hidden ml-2">
+<img alt="Student profile avatar" class="w-full h-full object-cover" data-alt="Portrait of a creative professional with focused expression against a dark atmospheric background with neon purple lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfSJPbRMIRWg4DIOKZjF-NlYt0vlt34Nkh937_o4dXmDPw90YI81E0wGlXVXG1WmMkH9YRX3w5LovtVrALHzg4F1q18PKSC0J44741X9bmJZhwjjRBILhPGkvA_7N_ikfbXhzP25wSgIHNh6TNimWdX_MkYzSsgUyIpC7k_2WX_9ojuMVLHXjVD5pbhT1MVAoPbVc1KEY2nu9nziKsTmWwO7UPgiVzzVY8EuxIZOD--BY8QkM5rKA4ZqIABp6XtlFy7Z8cEgeHZvfd"/>
+</div>
+</div>
+<div class="bg-white/10 h-px w-full absolute bottom-0 left-0"></div>
+</header>
+<!-- Miller Columns Container -->
+<div class="flex flex-1 pt-20 overflow-hidden">
+<!-- Column 1: Root Folders -->
+<div class="w-64 border-r border-white/5 flex flex-col miller-column overflow-y-auto bg-surface-container-low/30">
+<div class="p-4 space-y-1">
+<div class="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-4 px-2 opacity-50">Storage Root</div>
+<button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-surface-container-highest text-primary font-medium text-sm text-left">
+<span class="material-symbols-outlined text-[20px]" data-icon="category">category</span>
+                        Applications
+                        <span class="material-symbols-outlined ml-auto text-xs opacity-50" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-white/5 text-sm text-left transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="database">database</span>
+                        Resources
+                        <span class="material-symbols-outlined ml-auto text-xs opacity-30" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-white/5 text-sm text-left transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="description">description</span>
+                        Notes
+                        <span class="material-symbols-outlined ml-auto text-xs opacity-30" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-white/5 text-sm text-left transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="archive">archive</span>
+                        Archives
+                        <span class="material-symbols-outlined ml-auto text-xs opacity-30" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Column 2: Subfolders -->
+<div class="w-72 border-r border-white/5 flex flex-col miller-column overflow-y-auto bg-surface-container-low/20">
+<div class="p-4 space-y-1">
+<div class="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-4 px-2 opacity-50">Applications</div>
+<button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-white/5 text-sm text-left transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="auto_awesome">auto_awesome</span>
+                        AI Core Modules
+                        <span class="material-symbols-outlined ml-auto text-xs opacity-30" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-surface-container-highest/50 text-secondary font-medium text-sm text-left">
+<span class="material-symbols-outlined text-[20px]" data-icon="palette">palette</span>
+                        Design Systems
+                        <span class="material-symbols-outlined ml-auto text-xs opacity-50" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-white/5 text-sm text-left transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="code">code</span>
+                        Repositories
+                        <span class="material-symbols-outlined ml-auto text-xs opacity-30" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Column 3: File/Item List -->
+<div class="flex-1 min-w-[320px] border-r border-white/5 flex flex-col miller-column overflow-y-auto">
+<div class="p-4">
+<div class="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-4 px-2 opacity-50">Design Systems / Assets</div>
+<div class="space-y-2">
+<!-- Active File Card -->
+<div class="group p-4 rounded-2xl bg-gradient-to-br from-surface-container-high to-surface-container border border-white/10 shadow-xl shadow-black/40">
+<div class="flex items-start justify-between mb-3">
+<div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-3xl" data-icon="token">token</span>
+</div>
+<span class="px-2 py-1 bg-secondary/10 text-secondary text-[10px] font-bold rounded uppercase tracking-tighter">Active</span>
+</div>
+<h3 class="font-headline font-bold text-white mb-1">Deep_Space_Aurora.json</h3>
+<p class="text-xs text-on-surface-variant leading-relaxed">Global visual tokens including aurora gradients and bento-specific metrics.</p>
+<div class="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
+<span class="text-[10px] text-on-surface-variant/60 font-mono">2.4 MB</span>
+<span class="text-[10px] text-on-surface-variant/60">Updated 2h ago</span>
+</div>
+</div>
+<!-- Secondary File List -->
+<div class="p-3 rounded-xl hover:bg-white/5 cursor-pointer flex items-center gap-4 transition-all">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</div>
+<div class="flex-1">
+<div class="text-sm font-medium text-on-surface">Styleguide_v4.pdf</div>
+<div class="text-[10px] text-on-surface-variant">42.1 MB • Yesterday</div>
+</div>
+</div>
+<div class="p-3 rounded-xl hover:bg-white/5 cursor-pointer flex items-center gap-4 transition-all">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="image">image</span>
+</div>
+<div class="flex-1">
+<div class="text-sm font-medium text-on-surface">Aurora_Background_Mesh.svg</div>
+<div class="text-[10px] text-on-surface-variant">156 KB • 3 days ago</div>
+</div>
+</div>
+<div class="p-3 rounded-xl hover:bg-white/5 cursor-pointer flex items-center gap-4 transition-all">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="article">article</span>
+</div>
+<div class="flex-1">
+<div class="text-sm font-medium text-on-surface">Accessibility_Audit_Logs.txt</div>
+<div class="text-[10px] text-on-surface-variant">12 KB • Oct 12, 2023</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 4: File Preview & Metadata -->
+<aside class="w-96 flex flex-col miller-column bg-[#0F131D]/90 backdrop-blur-3xl overflow-y-auto">
+<div class="p-8">
+<div class="aspect-video w-full rounded-2xl overflow-hidden bg-surface-container-highest border border-white/10 mb-8 relative group">
+<img alt="Aurora Space Visual" class="w-full h-full object-cover opacity-80" data-alt="Cosmic nebula with glowing vibrant purple and emerald green gases against a star-filled deep space background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOWN0o_miWyWaSPTYP6LyXfJSBeJnRhn5DjZ8T15SEjrmM1sLhOm_GNdsRhz1GK9swFkJgWWFvSltL9y58lLOXWOSO8hknZ0VaogFrTVK2bVx1s32OJ0dwiKvlc4N13oAe6yAdsRt3EW8yjYMFFw3N_4Pl_XFdZRptlc4yGepyD5aEletz1ySBuXQY5NXsl-PSxjtBgbH5OL9DAuZs18m6bqaBP4YZ75nUomIDptVc4-kVbwQYPs9QGn2CVaZjCKpPhXzA-oHyx5yr"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent opacity-60"></div>
+<div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+<div class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+<span class="material-symbols-outlined text-white text-sm" data-icon="fullscreen">fullscreen</span>
+</div>
+</div>
+</div>
+<div class="mb-8">
+<div class="flex items-center gap-2 mb-2">
+<span class="px-2 py-0.5 bg-primary/20 text-primary text-[9px] font-black rounded uppercase tracking-wider">Primary Asset</span>
+<span class="px-2 py-0.5 bg-tertiary/20 text-tertiary text-[9px] font-black rounded uppercase tracking-wider">LOCKED</span>
+</div>
+<h2 class="font-headline text-2xl font-bold text-white mb-2">Deep_Space_Aurora.json</h2>
+<p class="text-sm text-on-surface-variant leading-relaxed mb-6">
+                            This core token file contains the primary atmospheric color definitions and bento-cell scaling rules for the Aetheris interface. DO NOT modify without celestial authorization.
+                        </p>
+</div>
+<div class="space-y-6">
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 rounded-2xl bg-surface-container border border-white/5">
+<div class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">File Type</div>
+<div class="text-white font-medium">JSON Source</div>
+</div>
+<div class="p-4 rounded-2xl bg-surface-container border border-white/5">
+<div class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">File Size</div>
+<div class="text-white font-medium">2.4 MB</div>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-surface-container border border-white/5">
+<div class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3">Recent Activity</div>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full overflow-hidden">
+<img alt="Collaborator" class="w-full h-full object-cover" data-alt="Portrait of a male digital artist with short hair and glasses in a soft lit studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzbtaPvTradf8Z-4Iqo5_O4X4urik6KVfcNc-CzOmlU37CIYfXTNpEULLvV46swtMoMl8b9y2tsnjRLIVW0sSrCdw7dqCJ1qX3SF5ntZUTQimJNj9AkXRkabL2ZEdFnVu0Pg4dO6OFBx4IuOoa3TPH_2KuwXe6AQ8PAujjg0jHNjuKCTnzxkirZVSdLkmMSupllKYoq_I0DdqoGXfqseASaT6yTxqpj77YEAw-e33Uv9ZfduSLikYohut6HrPZfKWvHlld-ufKUXaz"/>
+</div>
+<div class="text-xs">
+<span class="text-white font-semibold">Alex Chen</span>
+<span class="text-on-surface-variant">committed changes</span>
+<div class="text-[10px] text-on-surface-variant/50">2 hours ago</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[14px]" data-icon="auto_fix_high">auto_fix_high</span>
+</div>
+<div class="text-xs">
+<span class="text-white font-semibold">Aetheris AI</span>
+<span class="text-on-surface-variant">optimized nodes</span>
+<div class="text-[10px] text-on-surface-variant/50">5 hours ago</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 bg-surface-bright text-white font-bold py-3 rounded-xl text-sm border border-white/10 hover:bg-white/10 transition-colors">
+                                Open Editor
+                            </button>
+<button class="w-12 h-12 flex items-center justify-center bg-surface-bright rounded-xl border border-white/10 hover:text-error transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Floating Tooltip / Focus Mode Hint -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl z-50 flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="text-[10px] font-black uppercase tracking-[0.2em] text-white">System Synchronized</span>
+</div>
+<div class="h-4 w-px bg-white/10"></div>
+<div class="flex items-center gap-4 text-[10px] text-on-surface-variant">
+<span><kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono">⌘</kbd> + <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono">F</kbd> Search</span>
+<span><kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono">N</kbd> New Entry</span>
+</div>
+</div>
+</body></html>

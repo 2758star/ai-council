@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aetheris Prime | Application Kanban</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#1d3b2a",
+                        "primary-dim": "#8a70f0",
+                        "on-surface": "#ebedfb",
+                        "primary-fixed-dim": "#a18cff",
+                        "on-tertiary-container": "#0e1f15",
+                        "surface-container-highest": "#202633",
+                        "surface-variant": "#202633",
+                        "error-container": "#a70138",
+                        "on-surface-variant": "#a7abb7",
+                        "primary": "#b6a0ff",
+                        "on-primary": "#420082",
+                        "error-dim": "#d73357",
+                        "on-secondary-container": "#c9f8ff",
+                        "on-primary-fixed": "#000000",
+                        "on-primary-container": "#330066",
+                        "on-error": "#490013",
+                        "on-secondary-fixed-variant": "#005462",
+                        "on-secondary": "#003641",
+                        "tertiary-dim": "#b5ffc2",
+                        "outline-variant": "#444852",
+                        "secondary-container": "#004b58",
+                        "outline": "#727581",
+                        "surface-container-lowest": "#000000",
+                        "secondary": "#00e3fd",
+                        "surface-dim": "#0a0e17",
+                        "secondary-fixed": "#00e3fd",
+                        "inverse-on-surface": "#515560",
+                        "primary-container": "#cabdff",
+                        "surface-tint": "#b6a0ff",
+                        "surface-container-high": "#1a1f2c",
+                        "primary-fixed": "#cabdff",
+                        "on-secondary-fixed": "#002931",
+                        "on-background": "#ebedfb",
+                        "background": "#0a0e17",
+                        "on-primary-fixed-variant": "#3f007c",
+                        "tertiary-fixed-dim": "#9af0ad",
+                        "secondary-fixed-dim": "#38cde0",
+                        "tertiary-container": "#6bd987",
+                        "on-error-container": "#ffb2b9",
+                        "on-tertiary": "#11261b",
+                        "surface": "#0a0e17",
+                        "tertiary-fixed": "#b5ffc2",
+                        "secondary-dim": "#38cde0",
+                        "error": "#ff6e84",
+                        "surface-bright": "#262c3a",
+                        "inverse-surface": "#faf9ff",
+                        "on-tertiary-fixed": "#0a190f",
+                        "tertiary": "#b5ffc2",
+                        "inverse-primary": "#7a63d2",
+                        "surface-container-low": "#0f131d",
+                        "surface-container": "#151925"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.75rem",
+                        "lg": "0.75rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>body {
+    font-family: "Manrope", system-ui, sans-serif;
+    background-color: #0A0E17;
+    overflow: hidden
+    }
+.aurora-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background: radial-gradient(circle at 20% 30%, rgba(182, 160, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(0, 227, 253, 0.1) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(181, 255, 194, 0.05) 0%, transparent 70%)
+    }
+.grain {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuASPJuzkrgxAHrhP-R-o-YwMVD2zAQ3PAxr68Ub7QbRC42COLW_oJvnGmaATz56x_joOI7yk-qldSi7AeYZ5LJ2u2bkdkMs4u4wvXkpqF5jR8LxyHylHrbwISsKVVXV4-m3VlF1uwhVO1JfTw-SLi_Kxj7zMRV0GMyzvdrAjivDgNA_LviwLFG8RJSKkK31vo8xwh05c277tRc_YGVvU6QSa4DFC46pGJbR3E1t5zvW3mxrv-2g5uIEFuZpEgOchiXHmB8mue8JNIBc)
+    }
+.kanban-column {
+    scrollbar-width: none
+    }
+.kanban-column::-webkit-scrollbar {
+    display: none
+    }
+.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }</style>
+<link href="../aetheris_prime/celestial-glass.css" rel="stylesheet"/>
+</head>
+<body class="text-on-surface h-screen flex overflow-hidden">
+<div class="aurora-bg"></div>
+<div class="grain"></div>
+<!-- SideNavBar (Execution from JSON) -->
+<aside class="fixed left-0 top-0 h-full w-64 border-r border-white/10 bg-[#0A0E17]/80 backdrop-blur-2xl flex flex-col h-full py-6 px-4 z-40">
+<div class="flex items-center gap-3 mb-10 px-2">
+<div class="w-10 h-10 rounded-xl bg-primary-dim flex items-center justify-center text-white font-black italic tracking-tighter text-xl">A</div>
+<div>
+<h1 class="text-violet-300 font-manrope font-bold text-lg leading-none">Aetheris</h1>
+<p class="text-on-surface-variant text-[10px] uppercase tracking-widest font-medium">Celestial Concierge</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<div class="bg-violet-500/20 text-violet-300 rounded-xl border-l-4 border-violet-500 font-body text-sm font-medium hover:translate-x-1 transition-all flex items-center gap-3 px-4 py-3 cursor-pointer">
+<span class="material-symbols-outlined">view_kanban</span>
+                Applications
+            </div>
+<div class="text-slate-400 hover:bg-white/5 font-body text-sm font-medium hover:translate-x-1 transition-all flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl">
+<span class="material-symbols-outlined">view_timeline</span>
+                Tasks
+            </div>
+<div class="text-slate-400 hover:bg-white/5 font-body text-sm font-medium hover:translate-x-1 transition-all flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl">
+<span class="material-symbols-outlined">folder_open</span>
+                Library
+            </div>
+<div class="text-slate-400 hover:bg-white/5 font-body text-sm font-medium hover:translate-x-1 transition-all flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl">
+<span class="material-symbols-outlined">center_focus_strong</span>
+                Focus
+            </div>
+</nav>
+<div class="mb-6 px-2">
+<button class="w-full bg-gradient-to-r from-primary to-primary-dim text-on-primary font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 hover:scale-105 transition-transform shadow-[0_0_20px_rgba(182, 160, 255,0.3)]">
+<span class="material-symbols-outlined">add</span>
+                New Entry
+            </button>
+</div>
+<div class="pt-6 border-t border-white/5 space-y-2">
+<div class="text-slate-400 hover:bg-white/5 font-body text-sm font-medium hover:translate-x-1 transition-all flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl">
+<span class="material-symbols-outlined">help_outline</span>
+                Support
+            </div>
+<div class="text-slate-400 hover:bg-white/5 font-body text-sm font-medium hover:translate-x-1 transition-all flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </div>
+</div>
+</aside>
+<main class="flex-1 ml-64 flex flex-col relative h-full">
+<!-- TopNavBar (Execution from JSON) -->
+<header class="fixed top-0 left-64 right-0 z-50 bg-transparent backdrop-blur-xl flex justify-between items-center px-8 py-4">
+<div class="flex items-center gap-6">
+<h2 class="font-manrope tracking-tight font-bold text-white text-xl">Applications</h2>
+<div class="flex gap-4">
+<a class="text-white border-b-2 border-violet-500 pb-1 font-body text-sm font-medium" href="#">Kanban</a>
+<a class="text-slate-400 hover:text-white transition-colors font-body text-sm font-medium" href="#">Hub</a>
+<a class="text-slate-400 hover:text-white transition-colors font-body text-sm font-medium" href="#">Knowledge</a>
+</div>
+</div>
+<div class="flex items-center gap-5">
+<div class="relative group">
+<span class="material-symbols-outlined text-slate-400 hover:text-white cursor-pointer transition-colors">notifications</span>
+<div class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></div>
+</div>
+<span class="material-symbols-outlined text-slate-400 hover:text-white cursor-pointer transition-colors">settings</span>
+<img alt="Student profile avatar" class="w-10 h-10 rounded-full border-2 border-white/10 hover:scale-105 transition-transform duration-300 cursor-pointer" data-alt="Close-up portrait of a stylish young man with a slight smile and modern hairstyle in soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIplUffVFXPamSh-FGa1uR5ZwfJs1WLHJT2YjUwWr_0617OjcqSDpTe8jUJJxuNhSqNeTXzs04HSl8LhpEW3qN3_F01K-aLzqbUdyk-9854uZjT9B-YygJ6a5ZxU-83iIhJWDMsG4MExrOSdJs3JbXUJNFCv-G8RnH-4gvWKD1zXNW8hCtvXs1RW_4GaAno5ZB-9ZXvbZc49W3cVBKJjWrGk3r1gF32fWXI-m-lZT5z7tclIaFs_RjCdBDiPskwP8d1Dsh6GhPW11l"/>
+</div>
+<div class="bg-white/10 h-px w-full absolute bottom-0 left-0"></div>
+</header>
+<!-- Kanban Board Content -->
+<div class="pt-24 px-8 pb-8 flex-1 flex gap-6 overflow-hidden">
+<!-- Search Column -->
+<div class="flex-1 flex flex-col min-w-[320px]">
+<div class="flex items-center justify-between mb-4 px-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<h3 class="font-headline font-bold text-on-surface tracking-tight uppercase text-xs">Search</h3>
+</div>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-[10px] text-on-surface-variant font-bold">04</span>
+</div>
+<div class="flex-1 kanban-column overflow-y-auto space-y-4">
+<!-- Glassmorphic Card -->
+<div class="bg-surface-container-low/40 backdrop-blur-xl p-5 rounded-xl border border-white/10 group cursor-pointer hover:bg-surface-variant/50 transition-all duration-300 shadow-xl">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-lg bg-white p-2">
+<img alt="Stanford Logo" class="w-full h-full object-contain" data-alt="Abstract minimalist logo of a prestigious university with heraldic elements in clean red and white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0ycJHHXgwFrZwLc3pww1W4VzvzdDX7vXQwxQzaVG-ybk27uE3DDiHbSgCvMImPyUX55_w7kyj3ySFyOWfr4D37Jut4cRwF4rdOjHrqqcjVgANqjk0btR8OoSGOfnRP-vau6gApyuVqxrjYCxHvkmr7oyD8XestPgGHlXt2fMoee-5l9BDwhtnYierazIgp5HKd2zilq1Wuq93PExjEI69PTMAgCcHbTpQLe5Oyx3VqKd3JnSe9Uhd3tACUCEM0Y5NTrQZS4EZ6tpm"/>
+</div>
+<span class="text-[10px] bg-tertiary-container/30 text-tertiary font-bold px-2 py-1 rounded-full uppercase">Priority</span>
+</div>
+<h4 class="font-headline font-bold text-white text-lg mb-1">Stanford Graduate</h4>
+<p class="text-on-surface-variant text-sm mb-4">Computer Science MS</p>
+<div class="flex items-center justify-between pt-4 border-t border-white/5">
+<div class="flex items-center gap-2 text-on-surface-variant text-xs">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+                                Dec 15
+                            </div>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border-2 border-surface bg-primary-dim flex items-center justify-center text-[10px] font-bold">AI</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low/40 backdrop-blur-xl p-5 rounded-xl border border-white/10 group cursor-pointer hover:bg-surface-variant/50 transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-lg bg-white p-2">
+<img alt="MIT Logo" class="w-full h-full object-contain" data-alt="Digital emblem representing a technological institute with geometric patterns in deep grey and maroon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL57ap1KTyANv54qNwvhoAGjCUbCVhjQY3JwNgMikbULmOkLI64jRw1D31jnUC3CaBwyUqlysqHr_g7HNYoNU8PVw9bkJLqktogLNpXQYyJANDnH2rREC8lRkrQfLYAH4U8k-I6TAt9URyNU_5wYAZw6mN0HPvCRR2dT0dOZXto0ScltXSEqKyben0tX11DPYcERJa4dFBaiA6Pm46pvDnm3r6o-TMThbB7n0bdznO4CTWJDFa2GbbxKqPZjZgdfL_BB1PTugUEZA1"/>
+</div>
+</div>
+<h4 class="font-headline font-bold text-white text-lg mb-1">MIT Sloan</h4>
+<p class="text-on-surface-variant text-sm mb-4">MBA Program</p>
+<div class="flex items-center justify-between pt-4 border-t border-white/5">
+<div class="flex items-center gap-2 text-on-surface-variant text-xs">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+                                Jan 05
+                            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Applied Column -->
+<div class="flex-1 flex flex-col min-w-[320px]">
+<div class="flex items-center justify-between mb-4 px-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<h3 class="font-headline font-bold text-on-surface tracking-tight uppercase text-xs">Applied</h3>
+</div>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-[10px] text-on-surface-variant font-bold">02</span>
+</div>
+<div class="flex-1 kanban-column overflow-y-auto space-y-4">
+<div class="bg-surface-container-low/40 backdrop-blur-xl p-5 rounded-xl border border-white/10 group cursor-pointer hover:bg-surface-variant/50 transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-lg bg-white p-2">
+<img alt="Oxford Logo" class="w-full h-full object-contain" data-alt="Traditional shield emblem with blue and gold colors on a white background, representing Oxford university" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDle06wndyPr5LmHqg3LGi4tDhZdQumYQkac5sxD0wHiSiBv7l0noR74kI1GlX3g6Z8iUSQ2omq-AoPOPZtY5cDOaQ7KXj7mUDmUcz6O0iy4A8W54Hc-osFXt6b7DLWV2hyszPKZ6ElvJhKUtoTGJ54Yl-stmglK4nP1AT7tCNYtvrCKyxm4gj_U-NDRkH5zxlmiq7w4LRhU0ZcfW8iNNV0sR6wwrARySrHs83gaGDy2JADuboEYxUKw-tkhPqLSWqQAvbf6k7XYnyQ"/>
+</div>
+<span class="text-[10px] bg-secondary-container/30 text-secondary font-bold px-2 py-1 rounded-full uppercase">Reviewing</span>
+</div>
+<h4 class="font-headline font-bold text-white text-lg mb-1">Oxford University</h4>
+<p class="text-on-surface-variant text-sm mb-4">MPhil Economics</p>
+<div class="flex items-center justify-between pt-4 border-t border-white/5">
+<div class="flex items-center gap-2 text-on-surface-variant text-xs font-medium">
+<span class="material-symbols-outlined text-sm text-secondary">check_circle</span>
+                                Submitted Nov 20
+                            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Interview Column -->
+<div class="flex-1 flex flex-col min-w-[320px]">
+<div class="flex items-center justify-between mb-4 px-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<h3 class="font-headline font-bold text-on-surface tracking-tight uppercase text-xs">Interview</h3>
+</div>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-[10px] text-on-surface-variant font-bold">01</span>
+</div>
+<div class="flex-1 kanban-column overflow-y-auto space-y-4">
+<div class="bg-primary/5 p-px rounded-xl">
+<div class="bg-[#151925]/90 backdrop-blur-3xl p-5 rounded-xl border border-primary/20 relative overflow-hidden group cursor-pointer shadow-[0_0_30px_rgba(197,154,255,0.1)]">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[40px] -mr-16 -mt-16 rounded-full"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="w-12 h-12 rounded-lg bg-white p-2 shadow-inner">
+<img alt="UPenn Logo" class="w-full h-full object-contain" data-alt="Modern logo for University of Pennsylvania featuring clean typography and a blue and red circular crest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUVQ0bhaNtRdC55DmzOKyeR268MQNN7HahirtRUq18bEfHP7N2rq3YpQp0oK3FTTKT3ylo4aphO0VhYOEz2lGMs2kXADiGdOPzOjOUHBVeCy_XPply_LnsLu8ilV7C5BL6Z3El_aR3IC0y4OOTkltLWtPd9kl4SUXjZAI4nlYuLAImr-o18JyI-ypRjlopgTvYD9mxNJzIRQUQSWvcK1bNkuuDWV3R2ewD8y6v3dS3m9J5PrfiokUrJtGuyjW2t8l_wd7dBfU7UZU1"/>
+</div>
+<span class="text-[10px] bg-primary/20 text-primary font-bold px-2 py-1 rounded-full uppercase border border-primary/30">Next Week</span>
+</div>
+<h4 class="font-headline font-bold text-white text-lg mb-1 relative z-10">UPenn / Wharton</h4>
+<p class="text-on-surface-variant text-sm mb-4 relative z-10">Leadership Program</p>
+<div class="bg-surface-container-highest/50 p-3 rounded-lg flex items-center gap-3 mb-4 relative z-10">
+<span class="material-symbols-outlined text-primary text-xl">event_upcoming</span>
+<div>
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider">Video Interview</p>
+<p class="text-white text-xs font-bold">Friday, Dec 08 • 2:00 PM</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Offer Column -->
+<div class="flex-1 flex flex-col min-w-[320px]">
+<div class="flex items-center justify-between mb-4 px-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<h3 class="font-headline font-bold text-on-surface tracking-tight uppercase text-xs">Offer</h3>
+</div>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-[10px] text-on-surface-variant font-bold">0</span>
+</div>
+<div class="flex-1 border-2 border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center text-center p-8">
+<span class="material-symbols-outlined text-white/10 text-6xl mb-4">auto_awesome</span>
+<p class="text-on-surface-variant text-sm max-w-[160px]">The finish line is near. Keep pushing!</p>
+</div>
+</div>
+</div>
+<!-- NavigationDrawer (Partially Open as requested) -->
+<aside class="fixed right-0 top-0 h-full w-96 bg-[#0F131D]/90 backdrop-blur-3xl border-l border-white/10 shadow-[-20px_0_40px_rgba(0,0,0,0.5)] z-50 transform translate-x-4 hover:translate-x-0 transition-transform duration-500 ease-in-out p-6 flex flex-col">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-emerald-400 font-bold font-body text-lg">Item Details</h3>
+<button class="w-8 h-8 rounded-full hover:bg-white/5 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto pr-2 kanban-column">
+<div class="mb-8">
+<div class="w-16 h-16 rounded-2xl bg-white p-3 mb-4 shadow-lg">
+<img alt="Stanford Logo" class="w-full h-full object-contain" data-alt="University logo design with classic red crest and typography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAr1wAVBL7nq0Wphm1w_4YTP_5AUnlkjk0F1WspuN-XBwULCnVKQdNb_p1BdEtJIrALdzWftyZZ3Mm7hP_3HKEr_I7sGVDLowjjtWHGgwp15tKJ6WMCTXSSV-UaszV64tnv1Dcm8lcdo_Eogc_zuve1pP3EuMIK1m8hF962jcrNAFoIzH65WfP1az3svH_Wegh8YsmKPMKvA99BSLhaQiXsZPX5N7P7smUKtxmNtG_G3_rtyEIhpInSc_X9r9SKQbS9RfJhnmPP19nN"/>
+</div>
+<h2 class="text-2xl font-headline font-extrabold text-white mb-1">Stanford Graduate</h2>
+<p class="text-on-surface-variant">Computer Science MS</p>
+</div>
+<div class="space-y-6">
+<section>
+<h4 class="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-4">Application Status</h4>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-3 text-emerald-400 font-bold">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span class="text-sm">Documents Collected</span>
+</div>
+<div class="flex items-center gap-3 text-slate-500">
+<span class="w-2 h-2 rounded-full bg-slate-700"></span>
+<span class="text-sm">Personal Statement Review</span>
+</div>
+<div class="flex items-center gap-3 text-slate-500">
+<span class="w-2 h-2 rounded-full bg-slate-700"></span>
+<span class="text-sm">Final Submission</span>
+</div>
+</div>
+</section>
+<section>
+<h4 class="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-4">Upcoming Deadlines</h4>
+<div class="bg-surface-variant/20 p-4 rounded-xl border border-white/5">
+<div class="flex justify-between items-center mb-2">
+<span class="text-white text-xs font-semibold">Priority Deadline</span>
+<span class="text-error text-xs font-bold">7 Days Left</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-error w-4/5 h-full"></div>
+</div>
+</div>
+</section>
+<section>
+<h4 class="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-4">AI Insight</h4>
+<div class="bg-violet-500/10 p-4 rounded-xl border border-violet-500/20">
+<div class="flex items-center gap-2 text-violet-300 mb-2">
+<span class="material-symbols-outlined text-sm">auto_fix_high</span>
+<span class="text-xs font-bold">Secretary AI Recommendation</span>
+</div>
+<p class="text-slate-400 text-xs leading-relaxed">
+                                Stanford emphasizes societal impact. Your current draft focuses heavily on technical skills. I recommend adding 200 words on your open-source contributions to better align with their 2024 intake values.
+                            </p>
+</div>
+</section>
+</div>
+</div>
+<div class="pt-6 border-t border-white/10 mt-auto">
+<button class="w-full py-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold rounded-xl transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">edit</span>
+                    Update Application
+                </button>
+</div>
+</aside>
+</main>
+<!-- FAB (Suppressed as per rules for Kanban page focus) -->
+</body></html>

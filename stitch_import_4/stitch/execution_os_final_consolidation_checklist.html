@@ -1,0 +1,88 @@
+# Execution OS: Final Design Consolidation & Review Checklist
+
+## 1. OFFICIAL MASTER VISUAL SYSTEM: "CURATOR PRO"
+This is the single source of truth for all visual and structural decisions.
+
+*   **Visual North Star:** Premium B2B productivity software. Calm, structured, and focused.
+*   **Visual Principles:** Light-theme first, soft neutral surfaces (mist gray, pale lavender-gray), low-saturation accents (pastel violet, mint, blue), subtle glassmorphism with high readability.
+*   **Layout Principles:** Stable desktop shell (left sidebar, top command bar, dominant main workspace, compact right support rail). 100vh fixed layout with **strictly no scrolling**.
+*   **Interaction Principles:** Tonal background fills, refined borders, and gentle elevation for active states. **Strictly no left-side colored accent strips or neon glows.**
+
+---
+
+## 2. OFFICIAL PAGES (MASTER SYSTEM)
+These pages are the gold standard and should be kept as the primary product screens.
+
+*   **Tasks & Schedule (Default State):** {{DATA:SCREEN:SCREEN_49}}
+*   **Dashboard (Unified Light):** {{DATA:SCREEN:SCREEN_50}}
+*   **Today & Tasks (Unified Light):** {{DATA:SCREEN:SCREEN_58}}
+*   **AI Assistant (Light Workspace):** {{DATA:SCREEN:SCREEN_46}}
+*   **Planning & Workload (Light - Enhanced Utility):** {{DATA:SCREEN:SCREEN_10}}
+
+---
+
+## 3. STATE VARIATIONS (TASKS & SCHEDULE)
+These are not new pages; they must share the same stable shell and layout skeleton as {{DATA:SCREEN:SCREEN_49}}.
+
+*   **Selected Date State:** {{DATA:SCREEN:SCREEN_6}}
+*   **Busy Month State:** {{DATA:SCREEN:SCREEN_65}}
+*   **Week View State:** {{DATA:SCREEN:SCREEN_27}}
+*   **Quick Add / Add Event State:** {{DATA:SCREEN:SCREEN_29}}
+*   **Task Scheduled State:** {{DATA:SCREEN:SCREEN_61}}
+*   **Empty / Low-Load State:** {{DATA:SCREEN:SCREEN_34}}
+*   **High-Density / Heavy Workload State:** {{DATA:SCREEN:SCREEN_55}}
+
+---
+
+## 4. PAGES TO DOWNGRADE TO REFERENCE ONLY
+These contain good ideas but conflict with the master design system's visual or structural rules.
+
+*   **Execution OS: Dashboard (Dark Concept):** {{DATA:SCREEN:SCREEN_45}} (Too conceptual/sci-fi)
+*   **Schedule (Light) Concept:** {{DATA:SCREEN:SCREEN_37}} (Layout diverges from the final stabilized shell)
+*   **AI Assistant (Integrated Workspace):** {{DATA:SCREEN:SCREEN_33}} (Used as a bridge, now superseded by {{DATA:SCREEN:SCREEN_46}})
+
+---
+
+## 5. PAGES TO REDRAW / ALIGN
+Functional requirements to be redrawn using the "Curator Pro" shell and component language.
+
+*   **Application Management:** Needs a dedicated screen aligned to the master shell.
+*   **Knowledge Base:** Needs a dedicated screen aligned to the master shell.
+*   **Journal & Inspiration:** Needs a dedicated screen aligned to the master shell.
+*   **Mistakes / Review:** Needs a dedicated screen aligned to the master shell.
+
+---
+
+## 6. OFFICIAL COMPONENT BASELINE
+These are the building blocks for development.
+
+*   **AppShell:** Fixed 100vh container with translucent sidebar and top-bar overlay.
+*   **SidebarNav:** Icon + Label list using tonal fills for active states. No side bars.
+*   **TopBar:** Frosted glass command bar with search and utility icons.
+*   **Panel/Card:** `bg-white/80` or `bg-slate-50/80` with `backdrop-blur-xl`, `border-slate-200/50`, and `rounded-2xl`.
+*   **PrimaryButton:** Solid soft-tint fill (e.g., indigo-600) with white text.
+*   **StatusTag:** Soft-fill backgrounds with high-contrast text labels.
+*   **CalendarCell:** Clean, unbordered grid cells with workload-dot indicators.
+
+---
+
+## 7. UNIFICATION & REJECTION RULES (STRICT)
+
+### Standardize:
+*   **Borders:** `1px border-slate-200/50` for light mode; `1px border-slate-800/50` for dark mode.
+*   **Shadows:** Recessed `shadow-sm` or ambient `shadow-xl` for overlays only.
+*   **Typography:** Manrope for headings, Inter for body/labels. Strict contrast ratios.
+
+### REJECT:
+*   **NO** left-side colored strips or accent bars on any component.
+*   **NO** glowing neon rails or luminous borders.
+*   **NO** page-level or inner-panel scrolling.
+*   **NO** mobile-style stacked vertical layouts.
+
+---
+
+## 8. FINAL IMPLEMENTATION PRIORITY
+1.  **Phase 1:** Build the **Tasks & Schedule** base shell and the core component library.
+2.  **Phase 2:** Implement the **8 State Variations** for the Tasks & Schedule page.
+3.  **Phase 3:** Align and implement the **Dashboard** and **AI Assistant** using the Phase 1 shell.
+4.  **Phase 4:** Develop the remaining functional modules (Knowledge Base, Journal, etc.) following the established shell.

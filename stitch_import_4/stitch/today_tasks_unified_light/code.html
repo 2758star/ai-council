@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Digital Curator - Tasks Cockpit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#6e0523",
+                        "secondary-fixed": "#b6eded",
+                        "on-surface": "#2d3338",
+                        "on-secondary-container": "#225a5b",
+                        "tertiary-container": "#ede0fc",
+                        "inverse-surface": "#0c0f11",
+                        "surface-variant": "#dee3e9",
+                        "inverse-primary": "#959efc",
+                        "on-primary-container": "#101974",
+                        "on-surface-variant": "#5a6065",
+                        "on-tertiary-fixed": "#463d53",
+                        "inverse-on-surface": "#9b9da0",
+                        "surface-dim": "#d5dbe1",
+                        "outline-variant": "#adb3b8",
+                        "background": "#f8f9fc",
+                        "secondary-dim": "#245b5c",
+                        "error": "#a8364b",
+                        "error-container": "#f97386",
+                        "surface": "#f8f9fc",
+                        "tertiary-fixed": "#ede0fc",
+                        "tertiary": "#645b72",
+                        "primary-fixed": "#959efc",
+                        "tertiary-fixed-dim": "#dfd2ed",
+                        "surface-container-low": "#f1f4f8",
+                        "on-secondary-fixed": "#074748",
+                        "on-secondary-fixed-variant": "#2d6465",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#2d3338",
+                        "primary-dim": "#414aa1",
+                        "on-primary-fixed": "#000129",
+                        "on-error": "#fff7f7",
+                        "secondary-container": "#b6eded",
+                        "outline": "#767b81",
+                        "error-dim": "#6b0221",
+                        "primary-fixed-dim": "#8891ed",
+                        "on-primary": "#fbf8ff",
+                        "on-tertiary": "#fef7ff",
+                        "primary-container": "#959efc",
+                        "secondary": "#316768",
+                        "surface-container": "#ebeef3",
+                        "surface-container-highest": "#dee3e9",
+                        "on-tertiary-container": "#584f66",
+                        "secondary-fixed-dim": "#a8dedf",
+                        "on-tertiary-fixed-variant": "#625970",
+                        "on-primary-fixed-variant": "#1c257d",
+                        "surface-container-high": "#e4e8ee",
+                        "surface-tint": "#4e57ae",
+                        "surface-bright": "#f8f9fc",
+                        "tertiary-dim": "#584f65",
+                        "on-secondary": "#e0ffff",
+                        "primary": "#4e57ae"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; overflow: hidden; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background h-screen">
+<!-- SideNavBar (Rail) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-slate-100/40 dark:bg-slate-900/40 backdrop-blur-xl flex flex-col p-4 gap-2 z-30">
+<div class="flex items-center gap-3 px-2 mb-8 mt-2">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-lg">curtains</span>
+</div>
+<div>
+<h1 class="font-manrope font-bold text-indigo-600 dark:text-indigo-400 tracking-tighter text-xl">Curator</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-medium">Premium Tier</p>
+</div>
+</div>
+<nav class="space-y-1">
+<!-- Active: Tasks -->
+<a class="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 rounded-lg shadow-sm font-semibold transition-transform scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-manrope text-sm tracking-tight">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-indigo-600">calendar_today</span>
+<span class="font-manrope text-sm tracking-tight">Schedule</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-indigo-600">folder_copy</span>
+<span class="font-manrope text-sm tracking-tight">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-indigo-600">insights</span>
+<span class="font-manrope text-sm tracking-tight">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-indigo-600">settings</span>
+<span class="font-manrope text-sm tracking-tight">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pb-4">
+<button class="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-xl font-semibold shadow-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">add</span>
+<span class="font-manrope text-sm">New Entry</span>
+</button>
+<div class="mt-6 flex items-center gap-3 px-2">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Professional headshot of a refined personal assistant in a minimalist office setting, soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU7U8JPQvlEGByMalUj21jEDMr7-wmnsET6QRyqG4l86aq-Mhdlenh-VWwysBbDBQpoM-Wc5LxM6NXc1Myoqh6bJV_ZKsQHsRz8ln5QKrSDSmTNUD_7Ns9na7RccFOO6e6bJ3LDOK0WatzJn3H4bDMwgMP63kzSWASFOM-wv_T4DgPRYiwf88HLyWb9yQqgj3h8VlWdT7vr7botk1mSCGd73S6eGLjdNjxJr-EZPKf5q6b6iVuY8Z5gx6mAyTT1L1RoGa6_FWpn8mD"/>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">Alex Sterling</p>
+<p class="text-[10px] text-on-surface-variant truncate">Curator Lead</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl border-b border-slate-100 dark:border-slate-900/50 flex justify-between items-center px-8 w-auto z-20">
+<div class="flex items-center gap-6 flex-1">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+<input class="w-full bg-surface-container-high border-none rounded-lg py-2 pl-10 text-sm focus:ring-2 focus:ring-primary/20" placeholder="Search tasks, meetings, or notes..." type="text"/>
+</div>
+<nav class="flex items-center gap-6">
+<a class="text-indigo-600 dark:text-indigo-400 font-bold font-manrope text-sm" href="#">Focus Mode</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-manrope text-sm transition-opacity" href="#">Team Sync</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-500 hover:text-indigo-500 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-500 hover:text-indigo-500 transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
+<p class="font-manrope font-extrabold text-indigo-600 dark:text-indigo-400">The Digital Curator</p>
+</div>
+</header>
+<!-- Support Rail (Right) -->
+<aside class="h-screen w-16 fixed right-0 top-0 border-l border-slate-100 dark:border-slate-800/50 bg-slate-50/30 dark:bg-slate-900/30 backdrop-blur-md flex flex-col items-center py-8 gap-8 z-30">
+<button class="text-indigo-600 dark:text-indigo-400 transition-all duration-300">
+<span class="material-symbols-outlined">edit_note</span>
+</button>
+<button class="text-slate-400 dark:text-slate-500 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 p-2 rounded-lg transition-all">
+<span class="material-symbols-outlined">smart_toy</span>
+</button>
+<button class="text-slate-400 dark:text-slate-500 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 p-2 rounded-lg transition-all">
+<span class="material-symbols-outlined">support_agent</span>
+</button>
+<div class="mt-auto">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-[10px] font-bold text-on-surface-variant">
+                +4
+            </div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 mr-16 mt-16 h-[calc(100vh-64px)] p-8 grid grid-cols-12 gap-8 bg-surface">
+<!-- Center Task Management Zone -->
+<div class="col-span-8 flex flex-col gap-8">
+<header>
+<h2 class="font-manrope text-3xl font-extrabold tracking-tight text-on-surface">Daily Manifest</h2>
+<p class="text-on-surface-variant font-body">Tuesday, May 14th — 12 tasks pending curator review.</p>
+</header>
+<div class="grid grid-cols-1 gap-6 overflow-hidden flex-1">
+<!-- Must Do (Priority Bento Card) -->
+<section class="bg-surface-container-lowest rounded-xl p-6 border-none shadow-sm relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl">priority_high</span>
+</div>
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-manrope font-bold text-lg text-primary flex items-center gap-2">
+                            Must do <span class="text-xs font-normal bg-primary-container px-2 py-0.5 rounded-full text-on-primary-container">3 Items</span>
+</h3>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-4 p-3 bg-surface rounded-lg hover:bg-primary-container/10 transition-colors">
+<span class="material-symbols-outlined text-outline">radio_button_unchecked</span>
+<div class="flex-1">
+<p class="text-sm font-semibold">Finalize Q3 Board Presentation</p>
+<p class="text-xs text-on-surface-variant">Due in 2 hours • High Intensity</p>
+</div>
+<img class="w-10 h-10 rounded-lg object-cover" data-alt="Close-up of sleek laptop keys and a professional leather-bound notebook with gold pen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIhH8VghBuTJNi0IO-WPXZOZza1RXg5lFQVedaTdLBEvrZrsVraLjDrzRgtvJDYza3rme6kCfdKBM7aiF9PSYm7uti9nn3h6_qo3rSErkWAwDeKjXnaaZjqvm2QuQs6rZWYkh_00cI0bxeSami7q83D85TByfIDLL-60dHXxh4XUD_4EUjdB6Lk5pq82FO9mboYPixzyVMg4ABmEdeTnC_3hK0PWNBa5Nhgd0eAqx6VxyGm-ooDsZKa01FRNTnMmqekdKnFoGO-CyT"/>
+</div>
+<div class="flex items-center gap-4 p-3 bg-surface rounded-lg hover:bg-primary-container/10 transition-colors">
+<span class="material-symbols-outlined text-outline">radio_button_unchecked</span>
+<div class="flex-1">
+<p class="text-sm font-semibold">Coordinate Private Flight Logistics (Paris)</p>
+<p class="text-xs text-on-surface-variant">Logistics Sync • Immediate</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">flight_takeoff</span>
+</div>
+<div class="flex items-center gap-4 p-3 bg-surface rounded-lg hover:bg-primary-container/10 transition-colors">
+<span class="material-symbols-outlined text-outline">radio_button_unchecked</span>
+<div class="flex-1">
+<p class="text-sm font-semibold">Verify Estate Security Audit</p>
+<p class="text-xs text-on-surface-variant">Security Protocol • Ongoing</p>
+</div>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-2 gap-6 h-full min-h-0">
+<!-- Should Do -->
+<section class="bg-surface-container-low rounded-xl p-6 flex flex-col">
+<h3 class="font-manrope font-bold text-md text-on-surface mb-4 flex items-center justify-between">
+                            Should do
+                            <span class="text-xs font-normal text-on-surface-variant">5 Items</span>
+</h3>
+<div class="space-y-4 overflow-y-auto pr-2">
+<div class="flex items-center gap-3 group">
+<span class="material-symbols-outlined text-outline-variant text-sm group-hover:text-primary transition-colors cursor-pointer">radio_button_unchecked</span>
+<p class="text-xs text-on-surface font-medium">Review curated dinner invitations</p>
+</div>
+<div class="flex items-center gap-3 group">
+<span class="material-symbols-outlined text-outline-variant text-sm group-hover:text-primary transition-colors cursor-pointer">radio_button_unchecked</span>
+<p class="text-xs text-on-surface font-medium">Draft internal memo for the gala team</p>
+</div>
+<div class="flex items-center gap-3 group">
+<span class="material-symbols-outlined text-outline-variant text-sm group-hover:text-primary transition-colors cursor-pointer">radio_button_unchecked</span>
+<p class="text-xs text-on-surface font-medium">Approve art gallery shipment insurance</p>
+</div>
+<div class="flex items-center gap-3 group">
+<span class="material-symbols-outlined text-outline-variant text-sm group-hover:text-primary transition-colors cursor-pointer">radio_button_unchecked</span>
+<p class="text-xs text-on-surface font-medium">Follow up on bespoke tailoring order</p>
+</div>
+</div>
+</section>
+<!-- Later -->
+<section class="bg-surface-container-low rounded-xl p-6 flex flex-col">
+<h3 class="font-manrope font-bold text-md text-on-surface mb-4 flex items-center justify-between">
+                            Later
+                            <span class="text-xs font-normal text-on-surface-variant">4 Items</span>
+</h3>
+<div class="space-y-4 overflow-y-auto pr-2">
+<div class="flex items-center gap-3 group">
+<span class="material-symbols-outlined text-outline-variant text-sm group-hover:text-primary transition-colors cursor-pointer">radio_button_unchecked</span>
+<p class="text-xs text-on-surface-variant italic">Research boutique vineyards in Tuscany</p>
+</div>
+<div class="flex items-center gap-3 group">
+<span class="material-symbols-outlined text-outline-variant text-sm group-hover:text-primary transition-colors cursor-pointer">radio_button_unchecked</span>
+<p class="text-xs text-on-surface-variant italic">Archive last month's project reports</p>
+</div>
+<div class="flex items-center gap-3 group">
+<span class="material-symbols-outlined text-outline-variant text-sm group-hover:text-primary transition-colors cursor-pointer">radio_button_unchecked</span>
+<p class="text-xs text-on-surface-variant italic">Schedule quarterly gardener review</p>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<!-- Right Compact Schedule Overview -->
+<div class="col-span-4 flex flex-col gap-6">
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border-none flex-1 flex flex-col overflow-hidden">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-manrope font-bold text-lg">Timeline</h3>
+<div class="flex gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-slate-200"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-slate-200"></span>
+</div>
+</div>
+<div class="flex-1 space-y-8 relative">
+<!-- Current Time Indicator Line -->
+<div class="absolute left-[39px] top-0 bottom-0 w-[1px] bg-slate-100"></div>
+<!-- 10:00 AM -->
+<div class="flex gap-4 relative z-10">
+<div class="w-10 text-right">
+<p class="text-[10px] font-bold text-on-surface-variant">10:00</p>
+</div>
+<div class="w-5 h-5 rounded-full border-2 border-primary bg-white ring-4 ring-white"></div>
+<div class="flex-1 bg-primary-container/20 p-3 rounded-lg">
+<p class="text-xs font-bold text-on-primary-container">Strategic Sync</p>
+<p class="text-[10px] text-on-primary-container/70">Executive Boardroom</p>
+</div>
+</div>
+<!-- 11:30 AM (Active) -->
+<div class="flex gap-4 relative z-10">
+<div class="w-10 text-right">
+<p class="text-[10px] font-bold text-primary">11:30</p>
+</div>
+<div class="w-5 h-5 rounded-full bg-primary ring-4 ring-primary/20"></div>
+<div class="flex-1 bg-white border border-slate-100 p-3 rounded-lg shadow-sm">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold">Curator Briefing</p>
+<p class="text-[10px] text-on-surface-variant">Ongoing • 45m left</p>
+</div>
+<div class="flex -space-x-2">
+<img class="w-5 h-5 rounded-full border border-white" data-alt="Corporate portrait of an executive male in his 40s" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL25lyc8pAwMabW4YLRQFMDY7cESXUdBBfE0AlfLonnJxvMCzp-FM0V_jrsdY15Xi5v0WMGha09CDsbxlWcj8TatAFhkjXXTPHI0YS586aR0BqLq7xJ41LCTe7HbHwq5bBq89MqWjouMmjQDEeM6XArAlzO4BqLZOvU4ztFX3LkqM_EbcPdAzqzTX1lSeFhALuR-AaqcOoNDV3jhgidan697DMnyIy9k4ndY8gr-BGtxHpfFZatBvaC9-cZ8oNYpTTfmZ_LJozMOdP"/>
+<img class="w-5 h-5 rounded-full border border-white" data-alt="Portrait of a female creative director with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMZ3EKtreEmIYppTsaT-EVYCoRA8aJUSPC2kO6ai78uoYebJ2BWE0vtcRHKykqw48U6b6CTR-I5bjv3qflHnDhevNypV5dwmY2ouNg0QCWTOMpYnnUoKITozOGsBWAMloQ_3vllcK-tNODHg_oHAvYYx6ktPuSxrBAlQBu9oaeZ5oiXD_qhN-BAUF7moe_7hD0DhMhFpxmkelExhkYKJzIXJYgiuuQKJvgbtFExOSvbHi3h5BCiFAlC6oAHVRF78yS3whdyOf47OSg"/>
+</div>
+</div>
+</div>
+</div>
+<!-- 01:00 PM -->
+<div class="flex gap-4 relative z-10 opacity-60">
+<div class="w-10 text-right">
+<p class="text-[10px] font-bold text-on-surface-variant">13:00</p>
+</div>
+<div class="w-5 h-5 rounded-full border-2 border-slate-200 bg-white ring-4 ring-white"></div>
+<div class="flex-1 p-3">
+<p class="text-xs font-semibold">Lunch Engagement</p>
+<p class="text-[10px] text-on-surface-variant">Maison Boulud</p>
+</div>
+</div>
+<!-- 03:00 PM -->
+<div class="flex gap-4 relative z-10 opacity-60">
+<div class="w-10 text-right">
+<p class="text-[10px] font-bold text-on-surface-variant">15:00</p>
+</div>
+<div class="w-5 h-5 rounded-full border-2 border-slate-200 bg-white ring-4 ring-white"></div>
+<div class="flex-1 p-3">
+<p class="text-xs font-semibold">Property Review</p>
+<p class="text-[10px] text-on-surface-variant">Virtual Site Tour</p>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-slate-50">
+<div class="p-4 bg-surface-container rounded-xl flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Soft abstract fluid gradient in muted tones of lavender and sage" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQLH5snzCEplYoAGwZJ-HmwUhqfCROEWK_Fj8qDBf18f1eqUNKv5GMmgs7cgPQ65w-xCIRlPyBMn97Q3NNHt2ph3ymBi5Oe8fRfpphIxU4C1ufKJbtRleOxOlsoR0kWNl6pbyVYBlxEPTbVYDOD-Mw0qJYQhSd1YIeKYXoKF0HE7CvFbLkMdkJ-ZQePuNBxSS3T_9k6L0PFSnsl-z3FIYRRo4QcvjLFwNEb9uQOzXCmUIiQINy1z0Y12N3LoBwvtMcLeCoEUp4qw-X"/>
+</div>
+<div class="flex-1">
+<p class="text-[10px] uppercase tracking-widest text-primary font-bold">Curator Advice</p>
+<p class="text-xs font-medium">"Prioritize the Board Q3 prep. 90% of your energy should flow there before 2 PM."</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

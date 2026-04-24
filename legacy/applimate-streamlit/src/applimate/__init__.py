@@ -1,0 +1,1 @@
+"""AppliMate local-first workspace."""

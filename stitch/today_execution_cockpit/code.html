@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Personal Secretary | Today Execution Hub</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            background: "#0a0e17",
+            surface: "#0a0e17",
+            "surface-container-low": "#0f131d",
+            "surface-container": "#151925",
+            "surface-container-high": "#1a1f2c",
+            "surface-container-highest": "#202633",
+            primary: "#b6a0ff",
+            secondary: "#00e3fd",
+            tertiary: "#b5ffc2",
+            "on-surface": "#ebedfb",
+            "on-surface-variant": "#a7abb7",
+            "outline-variant": "#444852"
+          },
+          fontFamily: { body: ["Manrope"], headline: ["Manrope"], label: ["Manrope"] }
+        }
+      }
+    }
+  </script>
+  <link href="../aetheris_prime/celestial-glass.css" rel="stylesheet"/>
+  <style>
+    .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+    .dense-table td { padding: 0.45rem 0.5rem; vertical-align: top; }
+    .dense-table td:first-child { color: #a7abb7; width: 42%; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body h-screen overflow-hidden">
+  <header class="h-16 px-6 flex items-center justify-between border-b border-white/5">
+    <div class="flex items-center gap-4">
+      <span class="text-base font-semibold tracking-wide">Personal Secretary</span>
+      <span class="text-on-surface-variant text-xs uppercase tracking-[0.14em]">Today Execution Hub</span>
+    </div>
+    <div class="flex items-center gap-2 text-xs">
+      <button class="px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant">Back</button>
+      <button class="px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant">Cancel</button>
+      <button class="px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant">Undo</button>
+      <button class="px-3 py-1.5 rounded-lg bg-surface-container-high">⌘K Command Palette</button>
+      <button class="px-3 py-1.5 rounded-lg bg-primary/20 text-primary">Quick Add</button>
+    </div>
+  </header>
+
+  <main class="h-[calc(100vh-4rem)] p-4 grid grid-cols-12 gap-4 overflow-hidden">
+    <section class="col-span-4 h-full rounded-xl bg-surface-container-low/50 p-4 overflow-hidden flex flex-col">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-semibold">Timeline + Task Blocks</h2>
+        <span class="text-[11px] text-on-surface-variant uppercase tracking-[0.1em]">Read/Execute</span>
+      </div>
+      <div class="space-y-3 overflow-y-auto pr-1">
+        <article class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-sm font-semibold">GRE Reading - Passage Mapping</p>
+          <p class="text-xs text-on-surface-variant mt-1">Moved GRE Reading to 14:00 because this is the highest-energy window and no commute conflict exists.</p>
+          <table class="dense-table w-full mt-2 text-xs">
+            <tr><td>title</td><td>GRE Reading - Passage Mapping</td></tr>
+            <tr><td>estimated_minutes</td><td>50</td></tr>
+            <tr><td>priority</td><td>P1</td></tr>
+            <tr><td>output_requirement</td><td>2 annotated passages + error log update</td></tr>
+            <tr><td>carryover_policy</td><td>split carryover, max 20 minutes</td></tr>
+            <tr><td>constraint_source</td><td>energy profile + fixed class at 15:30</td></tr>
+            <tr><td>replan_rank</td><td>1</td></tr>
+            <tr><td>why_this_block_exists</td><td>highest impact block before commute window</td></tr>
+          </table>
+        </article>
+
+        <article class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-sm font-semibold">Quant Drill - Functions Set B</p>
+          <p class="text-xs text-on-surface-variant mt-1">Quant was placed at 19:30 because medium-intensity tasks fit better after the verbal block.</p>
+          <table class="dense-table w-full mt-2 text-xs">
+            <tr><td>title</td><td>Quant Drill - Functions Set B</td></tr>
+            <tr><td>estimated_minutes</td><td>40</td></tr>
+            <tr><td>priority</td><td>P2</td></tr>
+            <tr><td>output_requirement</td><td>15 questions + miss-classification tags</td></tr>
+            <tr><td>carryover_policy</td><td>allow full rollover to next day</td></tr>
+            <tr><td>constraint_source</td><td>post-dinner low variance block</td></tr>
+            <tr><td>replan_rank</td><td>3</td></tr>
+            <tr><td>why_this_block_exists</td><td>stabilizes daily output count with lower cognitive load</td></tr>
+          </table>
+        </article>
+
+        <article class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-sm font-semibold">Application Essay Revision</p>
+          <p class="text-xs text-on-surface-variant mt-1">2 carryovers detected. Recommend split carryover, not full rollover.</p>
+          <table class="dense-table w-full mt-2 text-xs">
+            <tr><td>title</td><td>Application Essay Revision</td></tr>
+            <tr><td>estimated_minutes</td><td>35</td></tr>
+            <tr><td>priority</td><td>P1</td></tr>
+            <tr><td>output_requirement</td><td>1 revised paragraph + rationale notes</td></tr>
+            <tr><td>carryover_policy</td><td>split carryover only</td></tr>
+            <tr><td>constraint_source</td><td>deadline proximity + fatigue cap</td></tr>
+            <tr><td>replan_rank</td><td>2</td></tr>
+            <tr><td>why_this_block_exists</td><td>preserves momentum on near-term deadline</td></tr>
+          </table>
+        </article>
+      </div>
+    </section>
+
+    <section class="col-span-4 h-full rounded-xl bg-surface-container-low/50 p-4 overflow-hidden flex flex-col">
+      <h2 class="font-semibold mb-3">Constraints / Fixed / Flags</h2>
+      <div class="space-y-3 overflow-y-auto pr-1 text-sm">
+        <div class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-xs uppercase tracking-[0.08em] text-on-surface-variant mb-2">Fixed Classes</p>
+          <p>13:30-15:00 GRE Verbal Workshop</p>
+          <p>20:00-21:00 IELTS Speaking Group</p>
+        </div>
+        <div class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-xs uppercase tracking-[0.08em] text-on-surface-variant mb-2">Commute / Hard Constraints</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 rounded-lg bg-surface-container-high text-xs">Commute 12:40-13:20</span>
+            <span class="px-2 py-1 rounded-lg bg-surface-container-high text-xs">Dinner 18:20-18:50</span>
+            <span class="px-2 py-1 rounded-lg bg-surface-container-high text-xs">No deep work after 21:30</span>
+          </div>
+        </div>
+        <div class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-xs uppercase tracking-[0.08em] text-on-surface-variant mb-2">Watch-Night Flags</p>
+          <p class="text-on-surface-variant text-xs">Detected: screen-overuse risk after 22:30. Suggest closing non-essential tabs at 21:50.</p>
+        </div>
+        <div class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-xs uppercase tracking-[0.08em] text-on-surface-variant mb-2">Daily Check-in (Factual)</p>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <input class="rounded-lg px-2 py-1.5 bg-surface-container-high" placeholder="Completion %"/>
+            <input class="rounded-lg px-2 py-1.5 bg-surface-container-high" placeholder="Actual Minutes"/>
+            <input class="rounded-lg px-2 py-1.5 bg-surface-container-high" placeholder="Blockers"/>
+            <input class="rounded-lg px-2 py-1.5 bg-surface-container-high" placeholder="Energy (1-5)"/>
+          </div>
+          <input class="rounded-lg px-2 py-1.5 bg-surface-container-high mt-2 w-full text-xs" placeholder="Emotion (optional)"/>
+        </div>
+        <div class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-xs uppercase tracking-[0.08em] text-on-surface-variant mb-2">Curiosity Inbox / Idea Parking Lot</p>
+          <p class="text-xs text-on-surface-variant">Capture tangents here. They do not alter Today unless explicitly promoted.</p>
+          <button class="mt-2 px-2.5 py-1.5 rounded-lg bg-surface-container-high text-xs">+ Park Idea</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="col-span-4 h-full rounded-xl bg-surface-container-low/50 p-4 overflow-hidden flex flex-col">
+      <h2 class="font-semibold mb-3">Rule Summary / Rationale / Control</h2>
+      <div class="space-y-3 overflow-y-auto pr-1 text-sm">
+        <div class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-xs uppercase tracking-[0.08em] text-on-surface-variant mb-2">Rule Summary</p>
+          <ul class="text-xs text-on-surface-variant space-y-1">
+            <li>Replanning mode: conservative</li>
+            <li>AI write mode: draft only</li>
+            <li>Carryover cap: 2 blocks/day</li>
+          </ul>
+        </div>
+        <div class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-xs uppercase tracking-[0.08em] text-on-surface-variant mb-2">Carryover Recommendations</p>
+          <p class="text-xs text-on-surface-variant">2 carryovers detected. Recommend split carryover, not full rollover.</p>
+        </div>
+        <div class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-xs uppercase tracking-[0.08em] text-on-surface-variant mb-2">AI Rationale</p>
+          <p class="text-xs text-on-surface-variant">No commute conflict exists in the 14:00 slot. Energy score is 4/5 and forecast drop begins at 15:20.</p>
+        </div>
+        <div class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-xs uppercase tracking-[0.08em] text-on-surface-variant mb-2">Why This Plan? (First-class)</p>
+          <p class="text-sm">The schedule prioritizes high-cognitive tasks during stable energy windows, preserves fixed constraints, and limits carryover debt growth.</p>
+        </div>
+        <div class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-xs uppercase tracking-[0.08em] text-on-surface-variant mb-2">Version Control</p>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <button class="px-2.5 py-1.5 rounded-lg bg-surface-container-high">View Diff</button>
+            <button class="px-2.5 py-1.5 rounded-lg bg-surface-container-high">Accept v12</button>
+            <button class="px-2.5 py-1.5 rounded-lg bg-surface-container-high">Supersede with v13</button>
+            <button class="px-2.5 py-1.5 rounded-lg bg-primary/20 text-primary">Commit</button>
+          </div>
+        </div>
+        <div class="rounded-xl bg-surface-container/50 p-3">
+          <p class="text-xs uppercase tracking-[0.08em] text-on-surface-variant mb-2">Notifications</p>
+          <p class="text-xs text-on-surface-variant">Factual tone only. Example: "Replan applied to 2 blocks. No fixed-constraint conflict introduced."</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

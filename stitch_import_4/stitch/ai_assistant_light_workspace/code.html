@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-bright": "#f8f9fc",
+                      "on-error-container": "#6e0523",
+                      "on-tertiary-fixed-variant": "#625970",
+                      "on-secondary-container": "#225a5b",
+                      "primary-fixed": "#959efc",
+                      "error-container": "#f97386",
+                      "tertiary": "#645b72",
+                      "inverse-primary": "#959efc",
+                      "background": "#f8f9fc",
+                      "surface-dim": "#d5dbe1",
+                      "on-secondary-fixed-variant": "#2d6465",
+                      "tertiary-container": "#ede0fc",
+                      "on-tertiary-container": "#584f66",
+                      "secondary-fixed-dim": "#a8dedf",
+                      "on-primary-fixed": "#000129",
+                      "secondary-container": "#b6eded",
+                      "primary": "#4e57ae",
+                      "error": "#a8364b",
+                      "surface-container-low": "#f1f4f8",
+                      "surface": "#f8f9fc",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-fixed": "#463d53",
+                      "on-surface-variant": "#5a6065",
+                      "on-primary-container": "#101974",
+                      "inverse-on-surface": "#9b9da0",
+                      "secondary-fixed": "#b6eded",
+                      "outline-variant": "#adb3b8",
+                      "outline": "#767b81",
+                      "surface-variant": "#dee3e9",
+                      "on-primary": "#fbf8ff",
+                      "on-tertiary": "#fef7ff",
+                      "tertiary-dim": "#584f65",
+                      "surface-tint": "#4e57ae",
+                      "on-primary-fixed-variant": "#1c257d",
+                      "secondary-dim": "#245b5c",
+                      "secondary": "#316768",
+                      "inverse-surface": "#0c0f11",
+                      "on-error": "#fff7f7",
+                      "surface-container-high": "#e4e8ee",
+                      "on-secondary": "#e0ffff",
+                      "primary-fixed-dim": "#8891ed",
+                      "on-secondary-fixed": "#074748",
+                      "on-surface": "#2d3338",
+                      "tertiary-fixed": "#ede0fc",
+                      "surface-container-highest": "#dee3e9",
+                      "on-background": "#2d3338",
+                      "primary-dim": "#414aa1",
+                      "tertiary-fixed-dim": "#dfd2ed",
+                      "surface-container": "#ebeef3",
+                      "primary-container": "#959efc",
+                      "error-dim": "#6b0221"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; background-color: #f8f9fc; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { backdrop-filter: blur(24px); background-color: rgba(255, 255, 255, 0.7); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="flex flex-col text-on-surface">
+<!-- Top Navigation Bar -->
+<header class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl flex justify-between items-center w-full px-8 sticky top-0 z-40 w-full h-16 border-b border-slate-200/15">
+<div class="flex items-center gap-8">
+<span class="font-manrope font-bold text-lg tracking-tighter text-[#6E77D1]">Ethereal Assistant</span>
+<nav class="flex gap-6">
+<a class="text-[#6E77D1] font-semibold border-b-2 border-[#6E77D1] pb-1 font-manrope text-sm tracking-tight transition-colors duration-200" href="#">Directives</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium pb-1 font-manrope text-sm tracking-tight hover:text-[#6E77D1] transition-colors duration-200" href="#">Transcripts</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium pb-1 font-manrope text-sm tracking-tight hover:text-[#6E77D1] transition-colors duration-200" href="#">Knowledge</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-[#4e57ae] text-white px-4 py-2 rounded-lg font-manrope text-sm font-semibold scale-98 active:opacity-80 transition-all">New Task</button>
+<div class="flex items-center gap-2 text-slate-500">
+<span class="material-symbols-outlined cursor-pointer hover:text-[#6E77D1] transition-colors">settings</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-[#6E77D1] transition-colors">help_outline</span>
+</div>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-surface-variant" data-alt="Close-up professional portrait of a stylish man with a clean beard against a soft neutral studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsszEsFMCBDU90QC0msmWhXlfoVI4g7bFdMoCsqHoYUo91jbwoN27o4fT466jmtqG3IAKiNvBux3hXTwvr4JaB83ILnyReU_2C6FF2YhqdB8fQ3tvo8cKUE3KYaPpmcf6mrnJ4t_cgG9-Y-bWXu7lSVH5CYXsWODxq-_LUdaV8QJhyNnrJDejeFdXwVNADLfYpl-eVLh2stC42pcLC3gx_8FZCPp5axZTE6J-1lqm-kl3OszEh1Uol5kfWhx5NsZlLOVOUOCw3ygnz"/>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Main Sidebar (Executive Desk) -->
+<aside class="h-screen w-64 flex flex-col border-r border-slate-200/15 bg-slate-50/50 backdrop-blur-lg p-4 gap-2">
+<div class="mb-6 px-2">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="font-manrope text-xs font-medium uppercase tracking-widest text-[#6E77D1]">Executive Desk</span>
+</div>
+<p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Ready for instruction</p>
+</div>
+<nav class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-[#6E77D1]/10 text-[#6E77D1] rounded-lg" href="#">
+<span class="material-symbols-outlined">space_dashboard</span>
+<span class="font-manrope text-xs font-medium uppercase tracking-widest">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200/30 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">mail</span>
+<span class="font-manrope text-xs font-medium uppercase tracking-widest">Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200/30 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-manrope text-xs font-medium uppercase tracking-widest">Calendar</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200/30 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-manrope text-xs font-medium uppercase tracking-widest">Assets</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200/30 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="font-manrope text-xs font-medium uppercase tracking-widest">Analytics</span>
+</a>
+</nav>
+<div class="pt-4 border-t border-slate-200/10 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200/30 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">dns</span>
+<span class="font-manrope text-xs font-medium uppercase tracking-widest">System Health</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200/30 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-manrope text-xs font-medium uppercase tracking-widest">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Central Workspace -->
+<main class="flex-1 flex flex-col bg-surface relative overflow-hidden">
+<!-- Workspace Layout: Thread + Tool Execution -->
+<div class="flex h-full p-6 gap-6">
+<!-- Conversation Thread Column -->
+<div class="flex-1 flex flex-col gap-4 overflow-hidden">
+<div class="flex-1 overflow-y-auto no-scrollbar pr-2 space-y-6">
+<!-- Message 1 (User) -->
+<div class="flex flex-col items-end">
+<div class="max-w-[80%] p-4 rounded-xl bg-surface-container text-on-surface font-body text-sm leading-relaxed border border-outline-variant/10">
+                                Analyze the latest Q3 logistics report and identify bottlenecks in the last-mile delivery segment. Cross-reference with the regional warehouse data.
+                            </div>
+</div>
+<!-- Message 2 (AI) -->
+<div class="flex flex-col items-start">
+<div class="max-w-[90%] p-5 rounded-xl bg-surface-container-lowest border border-outline-variant/5 shadow-sm">
+<div class="flex items-center gap-2 mb-3 text-[#6E77D1]">
+<span class="material-symbols-outlined text-sm">memory</span>
+<span class="font-headline text-xs font-bold uppercase tracking-wider">System Agent</span>
+</div>
+<p class="font-body text-sm text-on-surface mb-4">Understood. I am initializing the analysis suite. Checking 3 data sources: Q3_Logistics_Final.pdf, Warehouse_Latency_Sept.csv, and Regional_Traffic_API.</p>
+<!-- Tool Execution Area -->
+<div class="bg-surface-container rounded-lg p-3 border border-outline-variant/20 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-fixed/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-base">analytics</span>
+</div>
+<div>
+<p class="text-[11px] font-bold text-on-surface-variant uppercase">Running Tool</p>
+<p class="text-xs font-medium text-primary">Multimodal Correlation Engine v4.2</p>
+</div>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 rounded bg-secondary-container text-on-secondary-container">
+<span class="material-symbols-outlined text-xs">check_circle</span>
+<span class="text-[10px] font-bold">COMPLETED</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Analysis Output Area -->
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/10 shadow-sm col-span-2">
+<h3 class="font-headline text-sm font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">insights</span>
+                                    Identified Bottlenecks
+                                </h3>
+<div class="grid grid-cols-3 gap-4">
+<div class="bg-surface p-3 rounded-lg">
+<p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Route Efficiency</p>
+<p class="text-xl font-headline font-extrabold text-[#6E77D1]">-14.2%</p>
+</div>
+<div class="bg-surface p-3 rounded-lg">
+<p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Fuel Overhead</p>
+<p class="text-xl font-headline font-extrabold text-error">+8.4%</p>
+</div>
+<div class="bg-surface p-3 rounded-lg">
+<p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Avg. Latency</p>
+<p class="text-xl font-headline font-extrabold text-secondary">2.4h</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Bar Section -->
+<div class="h-24 bg-surface-container-lowest rounded-2xl border border-outline-variant/15 p-4 flex flex-col gap-2 shadow-sm">
+<div class="flex-1 flex gap-4">
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-sm font-body text-on-surface" placeholder="Type your next directive..." type="text"/>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors" title="Screenshot Analysis">
+<span class="material-symbols-outlined">screenshot_region</span>
+</button>
+<button class="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<button class="bg-primary text-white p-2 px-4 rounded-lg flex items-center gap-2 font-headline text-xs font-bold scale-98 active:opacity-80 transition-all">
+<span>EXECUTE</span>
+<span class="material-symbols-outlined text-sm">bolt</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Right Rail (System Rail) -->
+<aside class="h-screen w-80 flex flex-col border-l border-slate-200/15 bg-slate-50/50 backdrop-blur-lg p-6 gap-8">
+<div class="space-y-6">
+<!-- Provider Status -->
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/10 shadow-sm">
+<div class="flex justify-between items-center mb-3">
+<span class="font-headline text-[11px] font-bold uppercase tracking-wider text-slate-500">Provider Status</span>
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-[#6E77D1]/10 rounded-lg flex items-center justify-center text-[#6E77D1]">
+<span class="material-symbols-outlined">memory</span>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">GPT-4o</p>
+<p class="text-[10px] text-slate-400 font-medium">Latent: 140ms • Enterprise v2</p>
+</div>
+</div>
+</div>
+<!-- Usage Quota -->
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/10 shadow-sm">
+<span class="font-headline text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-3 block">Usage Quota</span>
+<div class="flex justify-between items-end mb-2">
+<p class="text-2xl font-headline font-extrabold text-on-surface">85%</p>
+<p class="text-[10px] text-slate-400 font-bold">12.4k / 15k Tokens</p>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 85%"></div>
+</div>
+</div>
+<!-- Draft Queue -->
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/10 shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<span class="font-headline text-[11px] font-bold uppercase tracking-wider text-slate-500">Draft Queue</span>
+<span class="px-2 py-0.5 bg-tertiary-container text-on-tertiary-container rounded text-[9px] font-bold">3 PENDING</span>
+</div>
+<div class="space-y-3">
+<div class="p-2 bg-surface rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400 text-sm">edit_note</span>
+<div class="flex-1">
+<p class="text-xs font-bold text-on-surface truncate">Inventory Summary</p>
+<p class="text-[9px] text-slate-400">Modified 12m ago</p>
+</div>
+</div>
+<div class="p-2 bg-surface rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400 text-sm">edit_note</span>
+<div class="flex-1">
+<p class="text-xs font-bold text-on-surface truncate">Regional Risk Map</p>
+<p class="text-[9px] text-slate-400">Modified 1h ago</p>
+</div>
+</div>
+<div class="p-2 bg-surface rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400 text-sm">edit_note</span>
+<div class="flex-1">
+<p class="text-xs font-bold text-on-surface truncate">Logistics Email Draft</p>
+<p class="text-[9px] text-slate-400">Modified 3h ago</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Plan Versioning -->
+<div class="bg-[#6E77D1] p-4 rounded-xl shadow-lg relative overflow-hidden">
+<!-- Decorate backdrop with a subtle gradient/texture -->
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 10% 20%, white 1px, transparent 1px); background-size: 10px 10px;"></div>
+<div class="relative z-10">
+<span class="text-[9px] font-bold uppercase tracking-[0.2em] text-white/70 mb-1 block">Active Workspace</span>
+<p class="text-white font-headline font-bold text-sm">Ethereal Pro+ v1.4</p>
+<div class="mt-4 flex items-center gap-2 text-white/80">
+<span class="material-symbols-outlined text-xs">auto_awesome</span>
+<span class="text-[10px] font-medium">Adaptive Priority Enabled</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto flex flex-col items-center gap-4">
+<div class="flex flex-col items-center gap-1 py-4 text-slate-400 hover:text-slate-600 cursor-pointer transition-all active:scale-95">
+<span class="material-symbols-outlined">pie_chart</span>
+<span class="font-inter text-[11px] font-semibold tracking-normal">Usage Details</span>
+</div>
+</div>
+</aside>
+</div>
+</body></html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aura Secretary - Week Planner</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-container": "#330066",
+            "primary-fixed": "#cabdff",
+            "on-surface-variant": "#a7abb7",
+            "on-secondary": "#003641",
+            "on-secondary-container": "#c9f8ff",
+            "on-error-container": "#ffb2b9",
+            "inverse-surface": "#faf9ff",
+            "inverse-primary": "#7a63d2",
+            "inverse-on-surface": "#515560",
+            "on-tertiary": "#11261b",
+            "on-tertiary-container": "#0e1f15",
+            "secondary": "#00e3fd",
+            "surface-container-highest": "#202633",
+            "secondary-fixed": "#00e3fd",
+            "background": "#0a0e17",
+            "tertiary-fixed": "#b5ffc2",
+            "surface-container": "#151925",
+            "on-primary": "#420082",
+            "on-primary-fixed": "#000000",
+            "surface-container-lowest": "#000000",
+            "on-secondary-fixed-variant": "#005462",
+            "secondary-fixed-dim": "#38cde0",
+            "outline": "#727581",
+            "surface-dim": "#0a0e17",
+            "error": "#ff6e84",
+            "on-tertiary-fixed-variant": "#1d3b2a",
+            "secondary-container": "#004b58",
+            "primary-dim": "#8a70f0",
+            "primary-fixed-dim": "#a18cff",
+            "primary": "#b6a0ff",
+            "surface-tint": "#b6a0ff",
+            "surface-variant": "#202633",
+            "outline-variant": "#444852",
+            "on-secondary-fixed": "#002931",
+            "surface-container-high": "#1a1f2c",
+            "tertiary": "#b5ffc2",
+            "error-container": "#a70138",
+            "surface": "#0a0e17",
+            "surface-bright": "#262c3a",
+            "primary-container": "#cabdff",
+            "tertiary-container": "#6bd987",
+            "tertiary-fixed-dim": "#9af0ad",
+            "tertiary-dim": "#b5ffc2",
+            "on-background": "#ebedfb",
+            "on-tertiary-fixed": "#0a190f",
+            "on-error": "#490013",
+            "surface-container-low": "#0f131d",
+            "on-surface": "#ebedfb",
+            "secondary-dim": "#38cde0",
+            "on-primary-fixed-variant": "#3f007c",
+            "error-dim": "#d73357"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.75rem",
+            "lg": "0.75rem",
+            "xl": "0.75rem",
+            "2xl": "1.5rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Manrope"],
+            "body": ["Manrope"],
+            "label": ["Manrope"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #0a0e17;
+      background-image: radial-gradient(circle at 50% 50%, rgba(182, 160, 255, 0.05) 0%, transparent 100%);
+      overflow: hidden;
+      height: 100vh;
+    }
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .heatmap-gradient {
+      background: linear-gradient(to top, rgba(0, 227, 253, 0.1), rgba(197, 154, 255, 0.3));
+    }
+    .aurora-blur {
+      filter: blur(100px);
+    }
+  </style>
+<link href="../aetheris_prime/celestial-glass.css" rel="stylesheet"/>
+</head>
+<body class="font-body text-on-surface">
+<div class="noise-overlay"></div>
+<!-- Background Aurora Effects -->
+<div class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary-dim/10 rounded-full aurora-blur"></div>
+<div class="fixed bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-secondary/5 rounded-full aurora-blur"></div>
+<!-- Shared Component: TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#0A0E17]/40 backdrop-blur-xl border-b border-white/10 shadow-[0_0_40px_rgba(182, 160, 255,0.1)]">
+<div class="flex justify-between items-center h-16 px-6 max-w-[1920px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold bg-gradient-to-r from-[#b6a0ff] to-[#b5ffc2] bg-clip-text text-transparent font-headline tracking-tight">Aura Secretary</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-[#A7ABB7] hover:bg-white/5 transition-all duration-300 px-3 py-1 rounded-lg font-headline font-semibold text-sm" href="#">Dashboard</a>
+<a class="text-[#b6a0ff] border-b-2 border-[#b6a0ff] hover:bg-white/5 transition-all duration-300 px-3 py-1 font-headline font-semibold text-sm" href="#">Schedule</a>
+<a class="text-[#A7ABB7] hover:bg-white/5 transition-all duration-300 px-3 py-1 rounded-lg font-headline font-semibold text-sm" href="#">Tasks</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+<input class="bg-surface-variant/40 border-none rounded-full pl-10 pr-4 py-1.5 text-sm focus:ring-1 focus:ring-primary w-64 text-on-surface" placeholder="Search tasks..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-white/5 rounded-full transition-all scale-105 active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-white/5 rounded-full transition-all scale-105 active:scale-95">
+<span class="material-symbols-outlined">bolt</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-white/5 rounded-full transition-all scale-105 active:scale-95">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<!-- Side Navigation Rail -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-16 bg-[#0F131D]/60 backdrop-blur-2xl border-r border-white/10 flex flex-col items-center py-8 gap-8 z-40">
+<button class="text-[#A7ABB7] hover:text-white transition-colors group">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">grid_view</span>
+</button>
+<button class="text-[#b6a0ff] bg-[#202633]/40 rounded-xl p-2 group">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">calendar_today</span>
+</button>
+<button class="text-[#A7ABB7] hover:text-white transition-colors group">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">check_circle</span>
+</button>
+<button class="text-[#A7ABB7] hover:text-white transition-colors group">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">psychology</span>
+</button>
+<div class="mt-auto">
+<button class="text-[#A7ABB7] hover:text-white transition-colors group">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">settings</span>
+</button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="pl-16 pr-80 pt-16 h-screen w-full relative z-10 flex flex-col">
+<!-- Header Section -->
+<div class="px-8 py-6 flex justify-between items-end">
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-primary mb-1 block">Timeline Architecture</span>
+<h1 class="text-4xl font-headline font-extrabold text-on-surface tracking-tight">Week Planner</h1>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container-high/40 backdrop-blur-md rounded-xl border border-white/5">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="text-xs font-label text-on-surface-variant uppercase tracking-tighter">Capacity Alert: Wed</span>
+</div>
+<button class="flex items-center gap-2 bg-gradient-to-r from-primary to-primary-dim px-6 py-2.5 rounded-xl text-on-primary-container font-label font-bold text-sm hover:scale-105 active:scale-95 transition-transform shadow-[0_0_20px_rgba(182, 160, 255,0.3)]">
+<span class="material-symbols-outlined text-sm">add</span>
+          NEW TASK
+        </button>
+</div>
+</div>
+<!-- Calendar Grid (Bento Asymmetry) -->
+<div class="flex-1 px-8 pb-8 grid grid-cols-7 gap-4">
+<!-- Monday -->
+<div class="flex flex-col gap-3 group">
+<div class="text-center pb-2">
+<span class="text-xs font-label text-on-surface-variant uppercase tracking-widest block">Mon</span>
+<span class="text-xl font-headline font-bold text-on-surface">12</span>
+</div>
+<div class="flex-1 bg-surface-container-low/40 rounded-2xl border border-white/5 backdrop-blur-md p-4 relative overflow-hidden flex flex-col gap-3 transition-all group-hover:bg-surface-container-high/60 group-hover:shadow-[0_0_30px_rgba(0, 227, 253,0.05)]">
+<!-- Heatmap Layer -->
+<div class="absolute inset-x-0 bottom-0 h-[40%] bg-secondary/10 heatmap-gradient"></div>
+<!-- Tasks -->
+<div class="relative z-10 bg-surface-variant/60 p-3 rounded-xl border border-white/10 cursor-grab active:cursor-grabbing hover:border-primary/40 transition-colors">
+<div class="flex justify-between items-start mb-1">
+<span class="text-[10px] font-label text-secondary uppercase tracking-widest">Executive</span>
+<span class="material-symbols-outlined text-xs text-on-surface-variant">drag_indicator</span>
+</div>
+<p class="text-sm font-medium leading-tight">Board Review Preparation</p>
+</div>
+<div class="relative z-10 bg-surface-variant/60 p-3 rounded-xl border border-white/10 cursor-grab active:cursor-grabbing hover:border-primary/40 transition-colors">
+<p class="text-sm font-medium leading-tight">Sync: Neural Net Team</p>
+</div>
+</div>
+</div>
+<!-- Tuesday -->
+<div class="flex flex-col gap-3 group">
+<div class="text-center pb-2">
+<span class="text-xs font-label text-on-surface-variant uppercase tracking-widest block">Tue</span>
+<span class="text-xl font-headline font-bold text-on-surface">13</span>
+</div>
+<div class="flex-1 bg-surface-container-low/40 rounded-2xl border border-white/5 backdrop-blur-md p-4 relative overflow-hidden flex flex-col gap-3 transition-all group-hover:bg-surface-container-high/60">
+<div class="absolute inset-x-0 bottom-0 h-[75%] bg-primary/10 heatmap-gradient opacity-60"></div>
+<!-- Constraint: Watching Night -->
+<div class="relative z-10 bg-error/10 border border-error/20 p-3 rounded-xl flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-sm">visibility</span>
+<span class="text-[10px] font-label text-error uppercase font-bold">Watching Night</span>
+</div>
+<div class="relative z-10 bg-surface-variant/60 p-3 rounded-xl border border-white/10 cursor-grab">
+<p class="text-sm font-medium leading-tight">Audit: System Latency</p>
+</div>
+</div>
+</div>
+<!-- Wednesday -->
+<div class="flex flex-col gap-3 group">
+<div class="text-center pb-2">
+<span class="text-xs font-label text-on-surface-variant uppercase tracking-widest block">Wed</span>
+<span class="text-xl font-headline font-bold text-on-surface">14</span>
+</div>
+<div class="flex-1 bg-surface-container-low/40 rounded-2xl border border-white/5 backdrop-blur-md p-4 relative overflow-hidden flex flex-col gap-3 transition-all group-hover:bg-surface-container-high/60 border-primary/20">
+<!-- Intense Heatmap for High Load -->
+<div class="absolute inset-x-0 bottom-0 h-[95%] bg-primary/30 heatmap-gradient"></div>
+<div class="relative z-10 bg-surface-variant/80 p-3 rounded-xl border border-primary/40 shadow-lg">
+<p class="text-sm font-bold text-primary mb-1">Critical Focus</p>
+<p class="text-sm font-medium leading-tight">Product Launch: Ion Core</p>
+</div>
+<div class="relative z-10 bg-surface-variant/60 p-3 rounded-xl border border-white/10">
+<p class="text-sm font-medium leading-tight">VIP Reception</p>
+</div>
+<div class="relative z-10 bg-surface-variant/60 p-3 rounded-xl border border-white/10">
+<p class="text-sm font-medium leading-tight">Internal Debrief</p>
+</div>
+</div>
+</div>
+<!-- Thursday -->
+<div class="flex flex-col gap-3 group">
+<div class="text-center pb-2">
+<span class="text-xs font-label text-on-surface-variant uppercase tracking-widest block">Thu</span>
+<span class="text-xl font-headline font-bold text-on-surface">15</span>
+</div>
+<div class="flex-1 bg-surface-container-low/40 rounded-2xl border border-white/5 backdrop-blur-md p-4 relative overflow-hidden flex flex-col gap-3 transition-all group-hover:bg-surface-container-high/60">
+<div class="absolute inset-x-0 bottom-0 h-[20%] bg-secondary/10 heatmap-gradient"></div>
+<!-- Constraint: Compensation Night -->
+<div class="relative z-10 bg-tertiary/10 border border-tertiary/20 p-3 rounded-xl flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-sm">bedtime</span>
+<span class="text-[10px] font-label text-tertiary uppercase font-bold">Comp Night</span>
+</div>
+</div>
+</div>
+<!-- Friday -->
+<div class="flex flex-col gap-3 group">
+<div class="text-center pb-2">
+<span class="text-xs font-label text-on-surface-variant uppercase tracking-widest block">Fri</span>
+<span class="text-xl font-headline font-bold text-on-surface">16</span>
+</div>
+<div class="flex-1 bg-surface-container-low/40 rounded-2xl border border-white/5 backdrop-blur-md p-4 relative overflow-hidden flex flex-col gap-3 transition-all group-hover:bg-surface-container-high/60">
+<div class="absolute inset-x-0 bottom-0 h-[50%] bg-secondary/10 heatmap-gradient"></div>
+<div class="relative z-10 bg-surface-variant/60 p-3 rounded-xl border border-white/10">
+<p class="text-sm font-medium leading-tight">Weekly Wrap-up</p>
+</div>
+<div class="relative z-10 bg-surface-variant/60 p-3 rounded-xl border border-white/10">
+<p class="text-sm font-medium leading-tight">Client Champagne Social</p>
+</div>
+</div>
+</div>
+<!-- Saturday -->
+<div class="flex flex-col gap-3 group opacity-60 hover:opacity-100 transition-opacity">
+<div class="text-center pb-2">
+<span class="text-xs font-label text-on-surface-variant uppercase tracking-widest block">Sat</span>
+<span class="text-xl font-headline font-bold text-on-surface">17</span>
+</div>
+<div class="flex-1 bg-surface-container-low/40 rounded-2xl border border-white/5 backdrop-blur-md p-4 relative overflow-hidden flex flex-col gap-3">
+<div class="absolute inset-0 flex items-center justify-center opacity-20">
+<span class="material-symbols-outlined text-4xl">weekend</span>
+</div>
+</div>
+</div>
+<!-- Sunday -->
+<div class="flex flex-col gap-3 group opacity-60 hover:opacity-100 transition-opacity">
+<div class="text-center pb-2">
+<span class="text-xs font-label text-on-surface-variant uppercase tracking-widest block">Sun</span>
+<span class="text-xl font-headline font-bold text-on-surface">18</span>
+</div>
+<div class="flex-1 bg-surface-container-low/40 rounded-2xl border border-white/5 backdrop-blur-md p-4 relative overflow-hidden flex flex-col gap-3">
+<div class="absolute inset-0 flex items-center justify-center opacity-20">
+<span class="material-symbols-outlined text-4xl">self_improvement</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Context Rail (Carryover Sidebar) -->
+<aside class="fixed right-0 top-0 h-screen w-80 bg-[#0A0E17]/80 backdrop-blur-xl border-l border-white/10 shadow-[-20px_0_40px_rgba(0,0,0,0.3)] z-40 flex flex-col p-6 overflow-y-hidden">
+<div class="mb-8 pt-10">
+<h2 class="text-lg font-headline font-bold text-[#00e3fd]">Carryover</h2>
+<p class="text-xs text-[#A7ABB7] font-body">Floating tasks from previous cycles</p>
+</div>
+<div class="flex-1 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
+<!-- Carryover Items -->
+<div class="p-4 rounded-2xl bg-surface-variant/40 border border-white/10 hover:border-secondary/30 transition-all cursor-grab group">
+<div class="flex justify-between items-start mb-2">
+<span class="px-2 py-0.5 rounded bg-secondary/10 text-secondary text-[10px] font-label uppercase tracking-tighter">Overdue</span>
+<span class="material-symbols-outlined text-sm text-on-surface-variant group-hover:text-secondary">drag_handle</span>
+</div>
+<p class="text-sm font-medium text-on-surface mb-3 leading-relaxed">Update Architectural Docs for Aurora v2.4</p>
+<div class="flex items-center gap-2 text-[10px] font-label text-on-surface-variant uppercase">
+<span class="material-symbols-outlined text-xs">history</span>
+<span>From last Friday</span>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-surface-variant/40 border border-white/10 hover:border-secondary/30 transition-all cursor-grab group">
+<div class="flex justify-between items-start mb-2">
+<span class="px-2 py-0.5 rounded bg-tertiary/10 text-tertiary text-[10px] font-label uppercase tracking-tighter">Low Priority</span>
+<span class="material-symbols-outlined text-sm text-on-surface-variant group-hover:text-secondary">drag_handle</span>
+</div>
+<p class="text-sm font-medium text-on-surface mb-3 leading-relaxed">Schedule Quarterly Performance Reviews</p>
+<div class="flex items-center gap-2 text-[10px] font-label text-on-surface-variant uppercase">
+<span class="material-symbols-outlined text-xs">history</span>
+<span>Backlogged</span>
+</div>
+</div>
+<!-- Recommendation Card -->
+<div class="mt-4 p-5 rounded-2xl bg-gradient-to-br from-surface-container-high to-surface-container border border-white/5 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-16 h-16 bg-secondary/10 rounded-full blur-xl"></div>
+<span class="material-symbols-outlined text-secondary mb-3">psychology</span>
+<p class="text-xs text-on-surface-variant mb-2">AI Intelligence Suggestion</p>
+<p class="text-sm font-medium leading-relaxed">"Thursday has the lowest cognitive pressure. Drag 'Architectural Docs' there to maintain flow."</p>
+</div>
+</div>
+<!-- Capacity Visualizer at bottom of rail -->
+<div class="mt-8 pt-6 border-t border-white/5">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs font-label text-on-surface-variant uppercase">Weekly Capacity</span>
+<span class="text-xs font-headline font-bold text-secondary">68%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full w-[68%] bg-secondary shadow-[0_0_10px_rgba(0, 227, 253,0.4)]"></div>
+</div>
+</div>
+</aside>
+<!-- FAB -->
+<button class="fixed bottom-8 right-88 flex items-center justify-center w-14 h-14 bg-primary rounded-2xl shadow-[0_10px_30px_rgba(182, 160, 255,0.4)] hover:scale-110 active:scale-95 transition-all z-50 group">
+<span class="material-symbols-outlined text-on-primary text-3xl font-bold">add</span>
+<div class="absolute right-16 px-4 py-2 bg-surface-bright backdrop-blur-xl rounded-xl border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+<span class="text-xs font-label text-on-surface uppercase tracking-widest">Quick Insert Task</span>
+</div>
+</button>
+</body></html>
