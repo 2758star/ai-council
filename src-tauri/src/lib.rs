@@ -423,6 +423,30 @@ struct MathNotebookPayload {
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
+struct WebSessionSendInput {
+    provider: String,
+    thread_url: String,
+    text: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct WebSessionReadInput {
+    provider: String,
+    thread_url: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct WebSessionReadPayload {
+    provider: String,
+    thread_url: String,
+    status: String,
+    text: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct FeishuInboundInput {
     raw_text: String,
     source: Option<String>,
@@ -3667,7 +3691,7 @@ fn initialize_database(app: tauri::AppHandle, _state: State<'_, AppState>) -> Re
     db::seed_real_study_data(&db_path).map_err(|error| format!("failed to seed real study data: {error}"))?;
 
     Ok(BootstrapPayload {
-        app_name: "Personal Secretary App".to_string(),
+        app_name: "AI Council".to_string(),
         database_path: db_path.display().to_string(),
         initialized_at: Utc::now().to_rfc3339(),
     })
@@ -4498,6 +4522,296 @@ fn open_external_url(url: String) -> Result<(), String> {
         }
     }
     Ok(())
+}
+
+fn applescript_quote(input: &str) -> String {
+    input.replace('\\', "\\\\").replace('"', "\\\"")
+}
+
+#[cfg(target_os = "macos")]
+fn execute_web_session_js_macos(thread_url: &str, js: &str) -> Result<String, String> {
+    let script = format!(
+        r#"
+set targetUrl to "{target_url}"
+set jsCode to "{js_code}"
+tell application "Google Chrome"
+  activate
+  set targetTab to missing value
+  repeat with w in windows
+    repeat with t in tabs of w
+      set currentUrl to URL of t
+      if currentUrl starts with targetUrl then
+        set targetTab to t
+        set active tab index of w to (index of t)
+        set index of w to 1
+        exit repeat
+      end if
+    end repeat
+    if targetTab is not missing value then exit repeat
+  end repeat
+  if targetTab is missing value then
+    open location targetUrl
+    delay 2
+    set targetTab to active tab of front window
+  end if
+  delay 1
+  execute javascript jsCode in targetTab
+end tell
+"#,
+        target_url = applescript_quote(thread_url),
+        js_code = applescript_quote(js)
+    );
+
+    let output = Command::new("osascript")
+        .arg("-e")
+        .arg(script)
+        .output()
+        .map_err(|error| format!("failed to run osascript: {error}"))?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+        return Err(if stderr.trim().is_empty() {
+            "osascript 执行失败".to_string()
+        } else {
+            stderr
+        });
+    }
+    Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+}
+
+#[cfg(target_os = "macos")]
+fn build_provider_send_js(provider: &str, text: &str) -> String {
+    let escaped_text = serde_json::to_string(text).unwrap_or_else(|_| "\"\"".to_string());
+    let send_selectors = match provider {
+        "openai" => vec![
+            "button[data-testid='send-button']",
+            "button[aria-label='Send prompt']",
+            "button[aria-label='Send message']",
+            "button[aria-label*='Send' i]",
+        ],
+        "anthropic" => vec![
+            "button[aria-label='Send Message']",
+            "button[aria-label='Send message']",
+            "button[aria-label*='Send' i]",
+            "fieldset button[type='button']",
+        ],
+        "gemini" => vec![
+            "button[aria-label='Send message']",
+            "button[mattooltip='Send message']",
+            "button.send-button",
+            "button[aria-label*='Send' i]",
+        ],
+        _ => vec![
+            "button[data-testid='send-button']",
+            "button[aria-label='Send message']",
+        ],
+    };
+    let selectors_json = serde_json::to_string(&send_selectors).unwrap_or_else(|_| "[]".to_string());
+    format!(
+        r#"(function() {{
+  const text = {escaped_text};
+  const sendSelectors = {selectors_json};
+  const editableSelectors = [
+    'textarea[placeholder]',
+    'div[contenteditable=\"true\"][data-placeholder]',
+    'textarea',
+    'div[contenteditable="true"]',
+    'div.ProseMirror',
+    'p[data-placeholder]',
+    '[role="textbox"]'
+  ];
+  const visible = (node) => {{
+    if (!node) return false;
+    const style = window.getComputedStyle(node);
+    const rect = node.getBoundingClientRect();
+    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+  }};
+  const editable = editableSelectors
+    .flatMap((selector) => Array.from(document.querySelectorAll(selector)))
+    .filter((node) => visible(node))
+    .at(-1);
+  if (!editable) {{
+    throw new Error('input_not_found');
+  }}
+  editable.focus();
+  if (editable.tagName === 'TEXTAREA') {{
+    editable.value = text;
+    editable.dispatchEvent(new Event('input', {{ bubbles: true }}));
+    editable.dispatchEvent(new Event('change', {{ bubbles: true }}));
+  }} else {{
+    editable.textContent = '';
+    editable.dispatchEvent(new InputEvent('beforeinput', {{ bubbles: true, inputType: 'insertText', data: text }}));
+    try {{
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(editable);
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      document.execCommand('insertText', false, text);
+    }} catch (_error) {{}}
+    if (!editable.textContent || editable.textContent.trim().length === 0) {{
+      editable.textContent = text;
+      editable.dispatchEvent(new Event('input', {{ bubbles: true }}));
+    }}
+    editable.dispatchEvent(new InputEvent('input', {{ bubbles: true, inputType: 'insertText', data: text }}));
+  }}
+  const sendButton = sendSelectors
+    .flatMap((selector) => Array.from(document.querySelectorAll(selector)))
+    .find((node) => visible(node) && !node.disabled && node.getAttribute('aria-disabled') !== 'true');
+  if (sendButton) {{
+    sendButton.click();
+    return 'sent_via_button';
+  }}
+  const keydown = new KeyboardEvent('keydown', {{ key: 'Enter', code: 'Enter', which: 13, keyCode: 13, bubbles: true }});
+  const keypress = new KeyboardEvent('keypress', {{ key: 'Enter', code: 'Enter', which: 13, keyCode: 13, bubbles: true }});
+  const keyup = new KeyboardEvent('keyup', {{ key: 'Enter', code: 'Enter', which: 13, keyCode: 13, bubbles: true }});
+  editable.dispatchEvent(keydown);
+  editable.dispatchEvent(keypress);
+  editable.dispatchEvent(keyup);
+  return 'sent_via_enter';
+}})();"#,
+    )
+}
+
+#[cfg(target_os = "macos")]
+fn build_provider_read_js(provider: &str) -> String {
+    let assistant_selectors = match provider {
+        "openai" => vec![
+            "[data-message-author-role='assistant']",
+            "[data-testid^='conversation-turn-'] [data-message-author-role='assistant']",
+            "article [data-message-author-role='assistant']",
+            ".markdown",
+        ],
+        "anthropic" => vec![
+            "[data-testid='assistant-message']",
+            "[data-is-streaming]",
+            "article .prose",
+            ".font-claude-message",
+            ".prose",
+        ],
+        "gemini" => vec![
+            "model-response",
+            "message-content",
+            ".model-response-text",
+            "[data-response-id]",
+            ".response-container-content",
+            ".response-content message-content",
+        ],
+        _ => vec![".markdown", ".prose", "[role='article']"],
+    };
+    let selectors_json = serde_json::to_string(&assistant_selectors).unwrap_or_else(|_| "[]".to_string());
+    format!(
+        r#"(function() {{
+  const assistantSelectors = {selectors_json};
+  const pickVisibleText = (node) => {{
+    if (!node) return '';
+    const style = window.getComputedStyle(node);
+    const rect = node.getBoundingClientRect();
+    if (style && (style.display === 'none' || style.visibility === 'hidden')) return '';
+    if (!rect || rect.width === 0 || rect.height === 0) return '';
+    return (node.innerText || node.textContent || '').trim();
+  }};
+
+  const candidates = [];
+  for (const selector of assistantSelectors) {{
+    for (const node of document.querySelectorAll(selector)) {{
+      const text = pickVisibleText(node);
+      if (!text) continue;
+      candidates.push(text);
+    }}
+  }}
+
+  let text = '';
+  if (candidates.length) {{
+    text = candidates[candidates.length - 1];
+  }} else {{
+    const fallbackNodes = Array.from(document.querySelectorAll('main div, main p, article div, article p, section div'))
+      .map((node) => pickVisibleText(node))
+      .filter((value) => value && value.length > 40);
+    if (fallbackNodes.length) {{
+      text = fallbackNodes[fallbackNodes.length - 1];
+    }}
+  }}
+
+  const loading = Boolean(
+    document.querySelector('[aria-label*="Stop" i]') ||
+    document.querySelector('[data-testid=\"stop-button\"]') ||
+    document.querySelector('.loading, .generating, .typing')
+  );
+
+  return JSON.stringify({{
+    status: loading ? 'responding' : text ? 'ready' : 'empty',
+    text
+  }});
+}})();"#,
+    )
+}
+
+#[cfg(target_os = "macos")]
+fn send_web_session_message_macos(input: &WebSessionSendInput) -> Result<String, String> {
+    let provider = input.provider.trim().to_lowercase();
+    let thread_url = input.thread_url.trim();
+    let text = input.text.trim();
+    if thread_url.is_empty() {
+        return Err("thread_url 不能为空".to_string());
+    }
+    if text.is_empty() {
+        return Err("text 不能为空".to_string());
+    }
+
+    let js = build_provider_send_js(&provider, text);
+    execute_web_session_js_macos(thread_url, &js)
+}
+
+#[tauri::command]
+fn send_web_session_message(payload: WebSessionSendInput) -> Result<String, String> {
+    #[cfg(target_os = "macos")]
+    {
+        return send_web_session_message_macos(&payload);
+    }
+    #[allow(unreachable_code)]
+    Err("当前仅支持 macOS 自动发送。".to_string())
+}
+
+#[cfg(target_os = "macos")]
+fn read_web_session_message_macos(input: &WebSessionReadInput) -> Result<WebSessionReadPayload, String> {
+    let provider = input.provider.trim().to_lowercase();
+    let thread_url = input.thread_url.trim();
+    if thread_url.is_empty() {
+        return Err("thread_url 不能为空".to_string());
+    }
+
+    let raw = execute_web_session_js_macos(thread_url, &build_provider_read_js(&provider))?;
+    let parsed: serde_json::Value =
+        serde_json::from_str(&raw).map_err(|error| format!("invalid web session payload: {error}; raw={raw}"))?;
+    let status = parsed
+        .get("status")
+        .and_then(|value| value.as_str())
+        .unwrap_or("unknown")
+        .to_string();
+    let text = parsed
+        .get("text")
+        .and_then(|value| value.as_str())
+        .unwrap_or("")
+        .trim()
+        .to_string();
+
+    Ok(WebSessionReadPayload {
+        provider,
+        thread_url: thread_url.to_string(),
+        status,
+        text,
+    })
+}
+
+#[tauri::command]
+fn read_web_session_message(payload: WebSessionReadInput) -> Result<WebSessionReadPayload, String> {
+    #[cfg(target_os = "macos")]
+    {
+        return read_web_session_message_macos(&payload);
+    }
+    #[allow(unreachable_code)]
+    Err("当前仅支持 macOS 读取网页消息。".to_string())
 }
 
 #[tauri::command]
@@ -10801,6 +11115,8 @@ pub fn run() {
             toggle_library_file_favorite,
             open_library_file,
             open_external_url,
+            send_web_session_message,
+            read_web_session_message,
             list_library_file_links,
             replace_library_file_links,
             batch_set_library_file_tags,

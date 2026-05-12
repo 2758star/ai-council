@@ -7,6 +7,7 @@ import {
   Gauge,
   Settings2,
   Bot,
+  Sparkles,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { createElement, type ComponentType } from "react";
@@ -56,6 +57,7 @@ export const routeItems: RouteItem[] = [
   { key: "library", label: "资料库", description: "学习资料与参考文件", icon: BookMarked },
   { key: "question-bank", label: "题库", description: "题库首页与做题入口", icon: QuestionBankIcon },
   { key: "briefing", label: "AI秘书", description: "对话与简报中心", icon: Bot },
+  { key: "ai", label: "AI议会", description: "多模型群聊与方案会审", icon: Sparkles },
   { key: "settings", label: "设置", description: "主题与集成配置", icon: Settings2 },
 ];
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Personal Secretary App",
+  "productName": "AI Council",
   "version": "0.2.0",
   "identifier": "com.codex.personal-secretary-app",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Personal Secretary App",
+        "title": "AI Council",
         "width": 1520,
         "height": 960,
         "minWidth": 1200,

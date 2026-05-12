@@ -1,8 +1,13 @@
-# Personal Secretary App
+# AI Council
 
-Personal Secretary App is a local-first desktop software project for graduate application management, language-exam planning, local file organization, focus sessions, and future AI assistant workflows.
+AI Council is a local-first multi-model discussion workspace built around:
 
-This repository now contains the new stage `0-1` Tauri skeleton and preserves the old Streamlit prototype under [`legacy/`](./legacy).
+- standalone React + Vite frontend
+- Tauri desktop shell
+- web-thread orchestration for ChatGPT / Claude / Gemini
+- future steward layer for prompt routing, compression, and quality control
+
+Older app history still exists in the repo, but the active product direction is now `AI Council`.
 
 ## Stage 0-1 Includes
 
@@ -17,6 +22,8 @@ This repository now contains the new stage `0-1` Tauri skeleton and preserves th
 
 ## Documentation
 
+- Cloud dev environment: [`docs/ai-council-cloud-dev.md`](./docs/ai-council-cloud-dev.md)
+- Refactor plan: [`docs/ai-council-refactor-plan.md`](./docs/ai-council-refactor-plan.md)
 - Chinese user manual: [`docs/user-manual-zh-CN.md`](./docs/user-manual-zh-CN.md)
 - Cloud relay quickstart: [`docs/cloud-deploy-quickstart.md`](./docs/cloud-deploy-quickstart.md)
 - Conversation archive / build log: [`docs/conversation-archive-2026-04-01.md`](./docs/conversation-archive-2026-04-01.md)

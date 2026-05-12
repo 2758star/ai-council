@@ -294,6 +294,37 @@ export async function openExternalUrl(url: string) {
   return invoke<void>("open_external_url", { url });
 }
 
+export async function sendWebSessionMessage(payload: {
+  provider: string;
+  threadUrl: string;
+  text: string;
+}) {
+  return invoke<string>("send_web_session_message", {
+    payload: {
+      provider: payload.provider,
+      threadUrl: payload.threadUrl,
+      text: payload.text,
+    },
+  });
+}
+
+export async function readWebSessionMessage(payload: {
+  provider: string;
+  threadUrl: string;
+}) {
+  return invoke<{
+    provider: string;
+    threadUrl: string;
+    status: string;
+    text: string;
+  }>("read_web_session_message", {
+    payload: {
+      provider: payload.provider,
+      threadUrl: payload.threadUrl,
+    },
+  });
+}
+
 export async function startMathErrorNotebook() {
   return invoke<MathNotebookResult>("start_math_error_notebook");
 }

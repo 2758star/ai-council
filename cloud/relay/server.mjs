@@ -1,5 +1,13 @@
 import { createHash, randomUUID, timingSafeEqual } from "node:crypto";
 import http from "node:http";
+import {
+  handleLlmChat,
+  handleLlmChatStream,
+  handleLlmFanout,
+  handleLlmProviders,
+  handleLlmRoundtable,
+  handleLlmRoundtableStream,
+} from "./unified-llm.mjs";
 
 const PORT = Number(process.env.PORT || "8080");
 const TZ = process.env.TZ || "Asia/Shanghai";
@@ -1095,6 +1103,36 @@ const server = http.createServer(async (req, res) => {
 
     if (method === "GET" && pathname === "/api/tasks/pending") {
       await handlePendingTasks(req, res, requestUrl);
+      return;
+    }
+
+    if (method === "GET" && pathname === "/api/llm/providers") {
+      await handleLlmProviders(req, res);
+      return;
+    }
+
+    if (method === "POST" && pathname === "/api/llm/chat") {
+      await handleLlmChat(req, res);
+      return;
+    }
+
+    if (method === "POST" && pathname === "/api/llm/chat/stream") {
+      await handleLlmChatStream(req, res);
+      return;
+    }
+
+    if (method === "POST" && pathname === "/api/llm/fanout") {
+      await handleLlmFanout(req, res);
+      return;
+    }
+
+    if (method === "POST" && pathname === "/api/llm/roundtable") {
+      await handleLlmRoundtable(req, res);
+      return;
+    }
+
+    if (method === "POST" && pathname === "/api/llm/roundtable/stream") {
+      await handleLlmRoundtableStream(req, res);
       return;
     }
 

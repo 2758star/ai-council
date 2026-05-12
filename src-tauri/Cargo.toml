@@ -1,7 +1,7 @@
 [package]
-name = "personal_secretary_app"
+name = "ai_council"
 version = "0.2.0"
-description = "Personal Secretary App"
+description = "AI Council"
 authors = ["Codex"]
 edition = "2021"
 
