@@ -2745,8 +2745,55 @@ function App() {
     return () => window.clearInterval(timer);
   }, [mode, autoSyncEnabled, autoSyncIntervalSec, boundBindings, sendingWeb, syncingWeb, webOrchestrating, onlyChangedSyncEnabled]);
 
+  const CollapsibleSection = ({
+    title,
+    summary,
+    accentColor,
+    defaultOpen = false,
+    children,
+  }: {
+    title: string;
+    summary?: string;
+    accentColor: string;
+    defaultOpen?: boolean;
+    children: React.ReactNode;
+  }) => {
+    const [open, setOpen] = useState(defaultOpen);
+    return (
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <button
+          className="w-full flex items-center gap-3 px-4 hover:bg-gray-50 transition-colors"
+          style={{ height: 48, minHeight: 48 }}
+          onClick={() => setOpen(!open)}
+        >
+          <div className={`w-1 self-stretch flex-shrink-0 rounded-full ${accentColor}`} />
+          <span className="text-xs font-bold uppercase tracking-wider text-gray-800 flex-1 text-left">{title}</span>
+          {!open && summary ? (
+            <span className="text-xs text-gray-400 truncate max-w-[140px] text-right">{summary}</span>
+          ) : null}
+          <svg
+            className={`w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0 ${open ? "rotate-180" : ""}`}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+        <div
+          className={`grid transition-all duration-200 ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+        >
+          <div className="overflow-hidden">
+            <div className="px-4 pb-4">{children}</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="council-shell">
+    <div className="council-shell min-h-screen bg-gray-100">
       <div className="council-grid">
         <aside className="panel sidebar">
           <div className="hero">
@@ -2772,8 +2819,8 @@ function App() {
             ))}
           </div>
 
-          <section className="section">
-            <div className="section-head">
+          <CollapsibleSection title="ROOM" summary={activeRoomRecord?.title || "未保存"} accentColor="bg-indigo-500" defaultOpen={false}>
+            <div className="section-head" style={{ marginTop: 0 }}>
               <div className="section-title">Room</div>
               <div className="provider-actions">
                 <button className="secondary-btn" onClick={saveCurrentRoom}>
@@ -2819,7 +2866,9 @@ function App() {
                 <p className="notice">还没有保存过讨论房间。</p>
               )}
             </div>
-            <div className="section-head" style={{ marginTop: 14 }}>
+          </CollapsibleSection>
+          <CollapsibleSection title="SESSION" summary={activeSessionRecord?.title || "未选中"} accentColor="bg-indigo-500" defaultOpen={false}>
+            <div className="section-head" style={{ marginTop: 0 }}>
               <div className="section-title">Session</div>
               <div className="provider-actions">
                 <button className="secondary-btn" onClick={createNewSession}>
@@ -2846,10 +2895,10 @@ function App() {
                 <p className="notice">这个房间里还没有保存过 Session。</p>
               )}
             </div>
-          </section>
+          </CollapsibleSection>
 
-          <section className="section">
-            <div className="section-head">
+          <CollapsibleSection title="RELAY" summary={relayUrl} accentColor="bg-indigo-500" defaultOpen={false}>
+            <div className="section-head" style={{ marginTop: 0 }}>
               <div className="section-title">Relay</div>
               <button className="secondary-btn" onClick={() => refreshProviderList().catch(() => undefined)}>
                 {loadingProviders ? "刷新中" : "刷新"}
@@ -2864,7 +2913,7 @@ function App() {
             <p className="notice" style={{ marginTop: 10 }}>
               当前地址：{relayUrl}
             </p>
-          </section>
+          </CollapsibleSection>
 
           {mode === "web" ? (
             <>
@@ -3209,8 +3258,8 @@ function App() {
             </>
           ) : null}
 
-          <section className="section">
-            <div className="section-title">Prompt</div>
+          <section className="section bg-white rounded-xl shadow-sm p-4">
+            <div className="text-xs font-bold uppercase tracking-wider text-gray-800 mb-3">PROMPT</div>
             <label className="label" style={{ marginTop: 12 }}>
               讨论目标
             </label>
@@ -3253,8 +3302,8 @@ function App() {
             </div>
           </section>
 
-          <section className="section" style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
-            <div className="section-title">Participants</div>
+          <section className="section bg-white rounded-xl shadow-sm p-4" style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
+            <div className="text-xs font-bold uppercase tracking-wider text-gray-800 mb-3">PARTICIPANTS</div>
             <div className="providers" style={{ marginTop: 12 }}>
               {participants.map((item, index) => (
                 <div key={item.provider} className="provider-card">
@@ -3299,7 +3348,7 @@ function App() {
             </div>
           </section>
 
-          <button className="primary-btn" style={{ height: 52, borderRadius: 18 }} disabled={running} onClick={() => runDiscussion().catch(() => undefined)}>
+          <button className="primary-btn bg-indigo-500 hover:bg-indigo-600 text-white" style={{ height: 52, borderRadius: 18 }} disabled={running} onClick={() => runDiscussion().catch(() => undefined)}>
             {running ? "讨论进行中..." : mode === "api" ? "开始群聊讨论" : "网页登录模式已接 Gemini"}
           </button>
           <p className="notice">{notice}</p>
@@ -3309,7 +3358,7 @@ function App() {
           <section className="panel masthead">
             <div className="masthead-copy">
               <div className="eyebrow">Council Feed</div>
-              <h2>{finalResult?.objective || topic}</h2>
+              <h2 className="text-2xl font-bold">{finalResult?.objective || topic}</h2>
               <p>这是一套全新独立入口。你可以把它当成专门的多模型讨论工作台，而不是原 app 的一个子页。</p>
               <div className="room-roster" style={{ marginTop: 10 }}>
                 <div className="room-roster-item">
@@ -3527,64 +3576,69 @@ function App() {
             </section>
 
             <aside className="summary-panel">
-              <section className="panel round-card">
-                <div className="panel-head">
-                  <div>
-                    <div className="panel-title">Round Ledger</div>
-                    <div className="panel-sub">按轮记录，而不是埋在旧 UI 里。</div>
+              <CollapsibleSection title="Round Ledger" accentColor="bg-violet-500" defaultOpen={false}>
+                <section className="panel round-card">
+                  <div className="panel-head">
+                    <div>
+                      <div className="panel-title">Round Ledger</div>
+                      <div className="panel-sub">按轮记录，而不是埋在旧 UI 里。</div>
+                    </div>
+                    <Bot size={16} />
                   </div>
-                  <Bot size={16} />
-                </div>
-                <div className="round-scroll">
-                  {finalResult?.roundResults?.length ? (
-                    <div className="transcript-list">
-                      {finalResult.roundResults.map((round) => (
-                        <div key={round.round} className="round-group">
-                          <div className="round-tag">Round {round.round}</div>
-                          <div className="round-items">
-                            {round.responses.map((entry, index) => (
-                              <div key={index} className="round-item">
-                                <div className="round-item-title">{entry.speaker}</div>
-                                <div className="round-item-copy">{"ok" in entry && entry.ok === false ? entry.message : entry.content}</div>
-                              </div>
-                            ))}
+                  <div className="round-scroll">
+                    {finalResult?.roundResults?.length ? (
+                      <div className="transcript-list">
+                        {finalResult.roundResults.map((round) => (
+                          <div key={round.round} className="round-group">
+                            <div className="round-tag">Round {round.round}</div>
+                            <div className="round-items">
+                              {round.responses.map((entry, index) => (
+                                <div key={index} className="round-item">
+                                  <div className="round-item-title">{entry.speaker}</div>
+                                  <div className="round-item-copy">{"ok" in entry && entry.ok === false ? entry.message : entry.content}</div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="notice">完成一场讨论后，这里会按轮落账。</p>
-                  )}
-                </div>
-              </section>
-
-              <section className="panel memory-card">
-                <div className="panel-head">
-                  <div>
-                    <div className="panel-title">Room Memory</div>
-                    <div className="panel-sub">更早消息会压缩在这里，后续轮次优先带这份短记忆。</div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="notice">完成一场讨论后，这里会按轮落账。</p>
+                    )}
                   </div>
-                </div>
-                <div className="round-scroll">
-                  {memorySnapshot.condensed.length ? (
-                    <div className="memory-list">
-                      {memorySnapshot.condensed.map((item, index) => (
-                        <div key={`${index}:${item.slice(0, 20)}`} className="memory-item">
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="notice">当前还没有需要压缩的更早消息，等对话更长时这里会自动沉淀。</p>
-                  )}
-                </div>
-              </section>
+                </section>
+              </CollapsibleSection>
 
-              <section className="summary-card">
-                <div className="eyebrow" style={{ color: "rgba(255,255,255,0.45)" }}>
-                  Summary
-                </div>
-                <div className="panel-sub" style={{ marginTop: 8 }}>
+              <CollapsibleSection title="Room Memory" accentColor="bg-violet-500" defaultOpen={false}>
+                <section className="panel memory-card">
+                  <div className="panel-head">
+                    <div>
+                      <div className="panel-title">Room Memory</div>
+                      <div className="panel-sub">更早消息会压缩在这里，后续轮次优先带这份短记忆。</div>
+                    </div>
+                  </div>
+                  <div className="round-scroll">
+                    {memorySnapshot.condensed.length ? (
+                      <div className="memory-list">
+                        {memorySnapshot.condensed.map((item, index) => (
+                          <div key={`${index}:${item.slice(0, 20)}`} className="memory-item">
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="notice">当前还没有需要压缩的更早消息，等对话更长时这里会自动沉淀。</p>
+                    )}
+                  </div>
+                </section>
+              </CollapsibleSection>
+
+              <CollapsibleSection title="Summary" accentColor="bg-violet-500" defaultOpen={false}>
+                <section className="summary-card">
+                  <div className="eyebrow" style={{ color: "rgba(255,255,255,0.45)" }}>
+                    Summary
+                  </div>
+                  <div className="panel-sub" style={{ marginTop: 8 }}>
                   {summary && "ok" in summary && summary.ok ? `${summary.provider} 输出` : localSummary ? "本地总结器" : "等待总结模型"}
                 </div>
                 <div className="summary-text">
@@ -3603,15 +3657,17 @@ function App() {
                       : "如果启用了总结模型，最后的共识、分歧和建议下一步会留在这里。"}
                 </div>
               </section>
+              </CollapsibleSection>
 
-              <section className="panel round-card">
-                <div className="panel-head">
-                  <div>
-                    <div className="panel-title">Final Review</div>
-                    <div className="panel-sub">阶段五：终稿候选、接受驳回、换人重写都在这里闭环。</div>
+              <CollapsibleSection title="Final Review" accentColor="bg-violet-500" defaultOpen={false}>
+                <section className="panel round-card">
+                  <div className="panel-head">
+                    <div>
+                      <div className="panel-title">Final Review</div>
+                      <div className="panel-sub">阶段五：终稿候选、接受驳回、换人重写都在这里闭环。</div>
+                    </div>
+                    <Sparkles size={16} />
                   </div>
-                  <Sparkles size={16} />
-                </div>
                 <div className="round-scroll">
                   {currentFinalDraft ? (
                     <div className="provider-card">
@@ -3673,17 +3729,19 @@ function App() {
                   ) : null}
                 </div>
               </section>
+              </CollapsibleSection>
 
-              <section className="panel round-card">
-                <div className="panel-head">
-                  <div>
-                    <div className="panel-title">Steward</div>
-                    <div className="panel-sub">
-                      {hasApiKey() ? "DeepSeek 管家已连接。" : "配置 DeepSeek API Key 即可启用云端管家。"}
+              <CollapsibleSection title="Steward" accentColor="bg-violet-500" defaultOpen={false}>
+                <section className="panel round-card">
+                  <div className="panel-head">
+                    <div>
+                      <div className="panel-title">Steward</div>
+                      <div className="panel-sub">
+                        {hasApiKey() ? "DeepSeek 管家已连接。" : "配置 DeepSeek API Key 即可启用云端管家。"}
+                      </div>
                     </div>
+                    <div className="status-inline">{stewardProvider}</div>
                   </div>
-                  <div className="status-inline">{stewardProvider}</div>
-                </div>
                 <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
                   <input
                     className="input"
@@ -3816,37 +3874,40 @@ function App() {
                     </p>
                   ) : null}
                 </div>
-              </section>
+                </section>
+              </CollapsibleSection>
 
-              <section className="panel round-card">
-                <div className="panel-head">
-                  <div>
-                    <div className="panel-title">Artifacts</div>
-                    <div className="panel-sub">每个 Session 自带产物层，后面可以继续升级成导出稿、决策单和交付物。</div>
+              <CollapsibleSection title="Artifacts" accentColor="bg-violet-500" defaultOpen={false}>
+                <section className="panel round-card">
+                  <div className="panel-head">
+                    <div>
+                      <div className="panel-title">Artifacts</div>
+                      <div className="panel-sub">每个 Session 自带产物层，后面可以继续升级成导出稿、决策单和交付物。</div>
+                    </div>
                   </div>
-                </div>
-                <div className="round-scroll">
-                  <div className="providers" style={{ marginTop: 0 }}>
-                    {artifacts.map((artifact) => (
-                      <div key={artifact.id} className="provider-card">
-                        <div className="provider-head">
-                          <div className="provider-name">{ARTIFACT_LABELS[artifact.kind]}</div>
-                          <span className="status-pill off">{formatClock(artifact.updatedAt)}</span>
+                  <div className="round-scroll">
+                    <div className="providers" style={{ marginTop: 0 }}>
+                      {artifacts.map((artifact) => (
+                        <div key={artifact.id} className="provider-card">
+                          <div className="provider-head">
+                            <div className="provider-name">{ARTIFACT_LABELS[artifact.kind]}</div>
+                            <span className="status-pill off">{formatClock(artifact.updatedAt)}</span>
+                          </div>
+                          <div className="provider-runtime-meta" style={{ marginTop: 8 }}>
+                            {artifact.title}
+                          </div>
+                          <textarea
+                            className="textarea"
+                            style={{ minHeight: 96, marginTop: 10 }}
+                            value={artifact.content}
+                            onChange={(e) => updateArtifact(artifact.kind, e.target.value)}
+                          />
                         </div>
-                        <div className="provider-runtime-meta" style={{ marginTop: 8 }}>
-                          {artifact.title}
-                        </div>
-                        <textarea
-                          className="textarea"
-                          style={{ minHeight: 96, marginTop: 10 }}
-                          value={artifact.content}
-                          onChange={(e) => updateArtifact(artifact.kind, e.target.value)}
-                        />
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </section>
+                </section>
+              </CollapsibleSection>
             </aside>
           </div>
         </main>
