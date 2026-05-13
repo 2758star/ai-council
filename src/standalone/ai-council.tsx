@@ -2,6 +2,25 @@ import { createRoot } from "react-dom/client";
 import { Bot, Globe2, Layers3, LoaderCircle, MessageSquareMore, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { openExternalUrl, readWebSessionMessage, sendWebSessionMessage } from "@/features/integrations/api";
+import {
+  composeMessages,
+  compressReply,
+  detectArguing,
+  evaluateQuota,
+  summarizeRound,
+  hasApiKey,
+  setApiKey as setDeepSeekKey,
+} from "./steward";
+import {
+  getTracker,
+  recordSuccess,
+  recordFailure,
+  updateQuotaSettings,
+  getAllTrackers,
+  getQuotaSummary,
+  resetTracker,
+} from "./quota-manager";
+import type { QuotaTracker } from "./quota-manager";
 import "./ai-council.css";
 
 type Mode = "api" | "web";
@@ -1086,6 +1105,34 @@ function parseJsonBlock<T>(text: string): T | null {
   }
 }
 
+const DEEPSEEK_STEWARD_KEY = "standalone_ai_council_deepseek_key";
+
+async function callDeepSeekDirectJson(systemPrompt: string, userMessage: string): Promise<string> {
+  const key = (localStorage.getItem(DEEPSEEK_STEWARD_KEY) || "").trim();
+  if (!key) throw new Error("DEEPSEEK_NO_KEY");
+  const resp = await fetch("https://api.deepseek.com/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: "deepseek-chat",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMessage },
+      ],
+      temperature: 0.3,
+      max_tokens: 900,
+    }),
+  });
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    throw new Error(`DeepSeek API ${resp.status}: ${text.slice(0, 200)}`);
+  }
+  const data = await resp.json();
+  const content = data?.choices?.[0]?.message?.content;
+  if (!content) throw new Error("DEEPSEEK_EMPTY_RESPONSE");
+  return content;
+}
+
 function buildParticipants(rows: ProviderRecord[]): Participant[] {
   return rows.map((row) => ({
     provider: row.id,
@@ -1157,6 +1204,11 @@ function App() {
   const stopOrchestratorRef = useRef(false);
   const liveTranscriptRef = useRef<TranscriptEntry[]>(liveTranscript);
   const importInputRef = useRef<HTMLInputElement | null>(null);
+  const [deepseekKeyMasked, setDeepseekKeyMasked] = useState(() => (hasApiKey() ? "••••••••" : ""));
+  const [quotaTrackers, setQuotaTrackers] = useState<Record<string, QuotaTracker>>(() => getAllTrackers());
+  const [quotaWarnings, setQuotaWarnings] = useState<string[]>([]);
+  const [argueDetection, setArgueDetection] = useState<{ isArguing: boolean; reason: string; suggestion: string } | null>(null);
+  const [roundOverview, setRoundOverview] = useState("");
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.mode, mode);
@@ -1616,7 +1668,11 @@ function App() {
     }
     try {
       await sendToWebThread(binding, payload);
+      const t = recordSuccess(binding.provider);
+      setQuotaTrackers((prev) => ({ ...prev, [binding.provider]: t }));
     } catch {
+      const t = recordFailure(binding.provider, "send failed");
+      setQuotaTrackers((prev) => ({ ...prev, [binding.provider]: t }));
       return;
     }
     for (let attempt = 0; attempt < 6; attempt += 1) {
@@ -1631,6 +1687,8 @@ function App() {
         setNotice(`${binding.label} 回复还没稳定，继续等待中...`);
       }
     }
+    const t = recordFailure(binding.provider, "reply timeout");
+    setQuotaTrackers((prev) => ({ ...prev, [binding.provider]: t }));
     return null;
   }
 
@@ -1918,6 +1976,85 @@ function App() {
       ),
     );
     setAwaitingUserTurn(true);
+    runQuotaEvaluation();
+    runRoundOverview();
+    runArguingDetection();
+  }
+
+  async function runQuotaEvaluation() {
+    const quotaSummary = getQuotaSummary();
+    const warnings: string[] = [];
+    for (const [provider, info] of Object.entries(quotaSummary)) {
+      const ratio = info.limit > 0 ? info.used / info.limit : 0;
+      if (ratio >= 0.8) {
+        const label = PROVIDER_LABELS[provider] || provider;
+        warnings.push(`${label} 额度已达 ${Math.round(ratio * 100)}%（${info.used}/${info.limit}），建议减少使用。`);
+      }
+    }
+    setQuotaWarnings(warnings);
+  }
+
+  async function runArguingDetection() {
+    const entries = liveTranscriptRef.current.slice(-6);
+    const replies: Record<string, string> = {};
+    let latestProvider = "";
+    let latestReply = "";
+    for (const entry of entries) {
+      if (entry.provider !== "user") {
+        replies[entry.speaker] = buildSnippet(entry.content);
+        latestProvider = entry.provider;
+        latestReply = entry.content;
+      }
+    }
+    if (!latestReply || Object.keys(replies).length < 2) return;
+    if (hasApiKey()) {
+      try {
+        const result = await detectArguing({
+          provider: latestProvider,
+          reply: latestReply,
+          previousReplies: replies,
+        });
+        setArgueDetection(result);
+      } catch {
+        // fall back to local heuristic
+        const quality = inspectDiscussionQuality(liveTranscriptRef.current);
+        setArgueDetection(
+          quality.isArguing
+            ? { isArguing: true, reason: quality.summary, suggestion: quality.suggestion }
+            : null,
+        );
+      }
+    } else {
+      const quality = inspectDiscussionQuality(liveTranscriptRef.current);
+      setArgueDetection(
+        quality.isArguing
+          ? { isArguing: true, reason: quality.summary, suggestion: quality.suggestion }
+          : null,
+      );
+    }
+  }
+
+  async function runRoundOverview() {
+    const recentReplies: Record<string, string> = {};
+    const entries = liveTranscriptRef.current.slice(-6);
+    for (const entry of entries) {
+      if (entry.provider !== "user") {
+        recentReplies[entry.speaker] = buildSnippet(entry.content);
+      }
+    }
+    if (!Object.keys(recentReplies).length) return;
+    if (hasApiKey()) {
+      try {
+        const summary = await summarizeRound({
+          topic,
+          roundNumber: nextRoundValue(liveTranscriptRef.current),
+          replies: recentReplies,
+        });
+        setRoundOverview(summary);
+      } catch {
+        setRoundOverview("");
+      }
+    }
   }
 
   function refreshLocalSummary() {
@@ -1938,31 +2075,45 @@ function App() {
     };
   }
 
-  async function requestStewardRelayJson<T>(task: string, fallback: () => T | Promise<T>, options?: { silentFallback?: boolean }) {
+  async function requestStewardRelayJson<T>(
+    task: string,
+    fallback: () => T | Promise<T>,
+    options?: { silentFallback?: boolean; deepseekSystem?: string },
+  ) {
+    // 1) DeepSeek direct (if key configured)
+    if (hasApiKey() && options?.deepseekSystem) {
+      try {
+        const text = await callDeepSeekDirectJson(options.deepseekSystem, task);
+        const parsed = parseJsonBlock<T>(text);
+        if (parsed) return parsed;
+      } catch {
+        // fall through to relay
+      }
+    }
+    // 2) Local relay
     const cfg = getStewardRelayConfig();
-    if (!cfg) {
-      return await fallback();
-    }
-    try {
-      const result = await requestRelayChat(relayUrl, {
-        provider: cfg.provider,
-        model: cfg.model,
-        system: "You are the steward layer inside AI Council. Always return strict JSON only, with no markdown fence unless necessary.",
-        messages: [{ role: "user", content: task }],
-        temperature: 0.2,
-        maxTokens: 900,
-      });
-      const parsed = parseJsonBlock<T>(result.text || "");
-      if (!parsed) {
+    if (cfg) {
+      try {
+        const result = await requestRelayChat(relayUrl, {
+          provider: cfg.provider,
+          model: cfg.model,
+          system:
+            "You are the steward layer inside AI Council. Always return strict JSON only, with no markdown fence unless necessary.",
+          messages: [{ role: "user", content: task }],
+          temperature: 0.2,
+          maxTokens: 900,
+        });
+        const parsed = parseJsonBlock<T>(result.text || "");
+        if (parsed) return parsed;
         throw new Error("steward_invalid_json");
+      } catch {
+        if (!options?.silentFallback) {
+          setNotice(`Steward relay 暂时不可用，已回退本地规则。`);
+        }
       }
-      return parsed;
-    } catch {
-      if (!options?.silentFallback) {
-        setNotice(`Steward relay 暂时不可用，已回退本地 ${stewardProvider} 规则。`);
-      }
-      return await fallback();
     }
+    // 3) Local fallback
+    return await fallback();
   }
 
   function updateArtifact(kind: ArtifactKind, content: string) {
@@ -2016,6 +2167,10 @@ function App() {
         condensed: compressTranscriptForSteward(liveTranscriptRef.current).split("\n").filter(Boolean),
         summary: "本地压缩完成。",
       }),
+      {
+        deepseekSystem:
+          "你是 AI Council 的管家，负责压缩多模型讨论记录。把 transcript 压缩为 2-5 条核心要点。只输出 JSON，不要任何其他内容。",
+      },
     );
     setStewardMemoryText((result.condensed || []).join("\n"));
     setNotice(result.summary || "管家已生成一版上下文压缩稿。");
@@ -2031,14 +2186,20 @@ function App() {
         `transcript:\n${liveTranscriptRef.current.map((entry) => `${entry.speaker}: ${entry.content}`).join("\n")}`,
       ].join("\n\n"),
       () => inspectDiscussionQuality(liveTranscriptRef.current),
+      {
+        deepseekSystem:
+          "你是 AI Council 的管家，评估讨论质量。判断是否有进展、是否在吵架、给出下一步建议。只输出 JSON，不要任何其他内容。",
+      },
     );
     setStewardQuality(result);
+    setArgueDetection(result.isArguing ? { isArguing: true, reason: result.summary, suggestion: result.suggestion } : null);
     setNotice("管家已完成讨论质量检查。");
   }
 
   async function runStewardDraftBuilder() {
     const recommendedStage = recommendStewardStage(discussionStage, stewardQuality, Boolean(stageNote.trim() || composerText.trim()));
     const members = (boundBindings.length ? boundBindings : bindings).map((binding) => `${binding.provider}:${binding.label}`);
+    const quotaSummary = getQuotaSummary();
     const result = await requestStewardRelayJson<StewardDraft>(
       [
         "你是 AI Council 的 steward，请为本轮生成各成员转述稿。",
@@ -2047,6 +2208,9 @@ function App() {
         `topic: ${topic}`,
         `instruction: ${stageNote || composerText || "请继续推进讨论。"}`,
         `members: ${members.join(", ")}`,
+        `quotaStatus:\n${Object.entries(quotaSummary)
+          .map(([k, v]) => `  ${k}: ${v.used}/${v.limit} (${v.status})`)
+          .join("\n")}`,
         `transcript:\n${liveTranscriptRef.current.map((entry) => `${entry.speaker}: ${entry.content}`).join("\n")}`,
       ].join("\n\n"),
       () =>
@@ -2057,6 +2221,10 @@ function App() {
           stageNote || composerText || "请继续推进讨论。",
           recommendedStage,
         ),
+      {
+        deepseekSystem:
+          "你是 AI Council 的管家，负责转述编排。为每个成员生成本轮应发的消息。每消息以【讨论主题】开头，不超过800字，不引导争论。额度紧张的成员可放入skip。只输出JSON。",
+      },
     );
     setStewardDraft(result);
     setDiscussionStage(result.stage || recommendedStage);
@@ -2088,7 +2256,11 @@ function App() {
           stewardProvider,
           quality: params.quality,
         }),
-      { silentFallback: true },
+      {
+        silentFallback: true,
+        deepseekSystem:
+          "你是 AI Council 的管家，判断一次协作 @ 是否放行。考虑阶段、内容质量、是否在吵架。只输出JSON。",
+      },
     );
   }
 
@@ -2163,6 +2335,28 @@ function App() {
       topic.trim() ? `讨论主题：${topic.trim()}` : "",
       `你被驳回的内容：${entry.content}`,
       reason ? `甲方意见：${reason}` : "",
+      "请重新回答，聚焦主题，给出更可执行、更贴题的版本。",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+    await sendAndTrack(binding, redoPrompt, `${binding.label} 重做`);
+    setNotice(`${binding.label} 已收到重做请求。`);
+  }
+
+  async function redoModelReply(entry: TranscriptEntry) {
+    if (entry.provider === "user" || entry.provider === "system") return;
+    const binding = bindings.find((item) => item.provider === entry.provider);
+    if (!binding?.threadUrl.trim()) {
+      setNotice("这个成员还没有绑定线程，暂时无法重做。");
+      return;
+    }
+    if (entry.id) {
+      markTranscriptEntryState(entry.id, "rejected", "已重做");
+    }
+    const redoPrompt = [
+      `你上一条回复被甲方驳回了。`,
+      topic.trim() ? `讨论主题：${topic.trim()}` : "",
+      `你被驳回的内容：${entry.content}`,
       "请重新回答，聚焦主题，给出更可执行、更贴题的版本。",
     ]
       .filter(Boolean)
@@ -2469,9 +2663,39 @@ function App() {
       return;
     }
 
+    // Auto-steward: if DeepSeek key is available, run steward compose first
+    let stewardMessages: Record<string, string> | undefined;
+    if (hasApiKey() && mentionRouting.targets.includes("all")) {
+      try {
+        const quotaSummary = getQuotaSummary();
+        const members = boundBindings.map((b) => b.provider);
+        const composeResult = await composeMessages({
+          topic,
+          userMessage: payload,
+          currentRound: nextRoundValue(liveTranscriptRef.current),
+          members,
+          latestReplies: {},
+          quotaStatus: quotaSummary,
+        });
+        stewardMessages = composeResult.messages;
+        setDiscussionStage(composeResult.stage as DiscussionStage);
+        if (composeResult.skip.length) {
+          setNotice(`管家建议跳过：${composeResult.skip.join("、")}`);
+        }
+      } catch {
+        // steward failed, fall through to direct send
+      }
+    }
+
     if (mentionRouting.targets.includes("all")) {
       const nextStage = inferNextStage(discussionStage, true);
-      await sendStageRoundToBindings(nextStage, payload, boundBindings.filter((binding) => shouldSendInStage(binding, nextStage, finalWriterProvider)), `甲方指令 · ${STAGE_LABELS[nextStage]}`);
+      await sendStageRoundToBindings(
+        nextStage,
+        payload,
+        boundBindings.filter((binding) => shouldSendInStage(binding, nextStage, finalWriterProvider)),
+        `甲方指令 · ${STAGE_LABELS[nextStage]}`,
+        stewardMessages,
+      );
       setComposerText("");
       return;
     }
@@ -2892,6 +3116,74 @@ function App() {
                       <p className="notice" style={{ marginTop: 10 }}>
                         {binding.note}
                       </p>
+                      {(() => {
+                        const qt = quotaTrackers[binding.provider];
+                        if (!qt) return null;
+                        const pct = Math.min(100, Math.round((qt.messagesSentThisWindow / qt.estimatedLimitPerWindow) * 100));
+                        const tone = qt.status === "rate_limited" || qt.status === "error" ? "danger" : qt.status === "warning" ? "warn" : "ok";
+                        return (
+                          <div className="quota-bar-wrap">
+                            <div className="quota-bar-head">
+                              <span className="quota-bar-label">额度</span>
+                              <span className={`quota-bar-pct ${tone}`}>
+                                {qt.messagesSentThisWindow}/{qt.estimatedLimitPerWindow}
+                              </span>
+                            </div>
+                            <div className="quota-bar-track">
+                              <div
+                                className={`quota-bar-fill ${tone}`}
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            <div className="quota-bar-meta">
+                              下次重置 {new Date(qt.nextEstimatedReset).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}
+                              {qt.consecutiveFailures > 0 ? ` | 连续失败 ${qt.consecutiveFailures}` : ""}
+                            </div>
+                            <div className="quota-adjust">
+                              <input
+                                className="input quota-adjust-input"
+                                type="number"
+                                min={1}
+                                max={200}
+                                placeholder="窗口上限"
+                                value={qt.estimatedLimitPerWindow}
+                                onChange={(e) => {
+                                  const v = Number(e.target.value);
+                                  if (v > 0) {
+                                    const t = updateQuotaSettings(binding.provider, { estimatedLimitPerWindow: v });
+                                    setQuotaTrackers((prev) => ({ ...prev, [binding.provider]: t }));
+                                  }
+                                }}
+                              />
+                              <input
+                                className="input quota-adjust-input"
+                                type="number"
+                                min={1}
+                                max={72}
+                                placeholder="重置间隔(h)"
+                                value={qt.resetIntervalHours}
+                                onChange={(e) => {
+                                  const v = Number(e.target.value);
+                                  if (v > 0) {
+                                    const t = updateQuotaSettings(binding.provider, { resetIntervalHours: v });
+                                    setQuotaTrackers((prev) => ({ ...prev, [binding.provider]: t }));
+                                  }
+                                }}
+                              />
+                              <button
+                                className="chip-btn"
+                                onClick={() => {
+                                  const t = resetTracker(binding.provider);
+                                  setQuotaTrackers((prev) => ({ ...prev, [binding.provider]: t }));
+                                  setNotice(`${binding.label} 额度已手动重置。`);
+                                }}
+                              >
+                                重置
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   ))}
                 </div>
@@ -3145,6 +3437,23 @@ function App() {
                 )}
               </div>
               <div className="composer-bar">
+                {quotaWarnings.length > 0 ? (
+                  <div className="quota-alert-bar">
+                    {quotaWarnings.map((w, i) => (
+                      <div key={i} className="quota-alert-item">
+                        {w}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+                {argueDetection?.isArguing ? (
+                  <div className="argue-warning-bar">
+                    ⚠ 检测到疑似争论：{argueDetection.reason} — 建议：{argueDetection.suggestion}
+                  </div>
+                ) : null}
+                {roundOverview ? (
+                  <div className="round-overview-bar">{roundOverview}</div>
+                ) : null}
                 <div className="composer-actions">
                   <button className="secondary-btn" disabled={sendingWeb !== null || syncingWeb !== null} onClick={() => continueAllBoundThreads().catch(() => undefined)}>
                     继续一轮
@@ -3369,9 +3678,46 @@ function App() {
                 <div className="panel-head">
                   <div>
                     <div className="panel-title">Steward</div>
-                    <div className="panel-sub">阶段 3 的管家层雏形：先本地可用，后续再切到 DeepSeek。</div>
+                    <div className="panel-sub">
+                      {hasApiKey() ? "DeepSeek 管家已连接。" : "配置 DeepSeek API Key 即可启用云端管家。"}
+                    </div>
                   </div>
                   <div className="status-inline">{stewardProvider}</div>
+                </div>
+                <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+                  <input
+                    className="input"
+                    style={{ flex: 1 }}
+                    type="password"
+                    placeholder="DeepSeek API Key"
+                    value={deepseekKeyMasked}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v && v !== "••••••••") {
+                        setDeepSeekKey(v);
+                        setDeepseekKeyMasked("••••••••");
+                        setNotice("DeepSeek API Key 已保存，下次启动可直接使用。");
+                      }
+                    }}
+                    onFocus={(e) => {
+                      if (hasApiKey()) {
+                        e.target.value = "";
+                        setDeepseekKeyMasked("");
+                      }
+                    }}
+                  />
+                  {hasApiKey() ? (
+                    <button
+                      className="chip-btn"
+                      onClick={() => {
+                        localStorage.removeItem("standalone_ai_council_deepseek_key");
+                        setDeepseekKeyMasked("");
+                        setNotice("DeepSeek API Key 已清除。");
+                      }}
+                    >
+                      清除
+                    </button>
+                  ) : null}
                 </div>
                 <div className="provider-actions" style={{ marginTop: 12 }}>
                   <select className="select auto-sync-select" value={stewardProvider} onChange={(e) => setStewardProvider(e.target.value as StewardRelayProvider)}>
@@ -3440,9 +3786,33 @@ function App() {
                       </div>
                     </div>
                   ) : null}
-                  {!stewardDraft && !stewardMemoryText && !stewardQuality ? (
+                  {argueDetection?.isArguing ? (
+                    <div className="provider-card" style={{ marginTop: 12, borderColor: "var(--danger)" }}>
+                      <div className="provider-head">
+                        <div className="provider-name">吵架检测</div>
+                        <span className="status-pill warn">ARGUING</span>
+                      </div>
+                      <div className="provider-runtime-meta" style={{ marginTop: 8 }}>
+                        {argueDetection.reason}
+                      </div>
+                      <div className="provider-snippet" style={{ marginTop: 10 }}>
+                        建议：{argueDetection.suggestion}
+                      </div>
+                    </div>
+                  ) : null}
+                  {roundOverview ? (
+                    <div className="provider-card" style={{ marginTop: 12 }}>
+                      <div className="provider-head">
+                        <div className="provider-name">本轮概览</div>
+                      </div>
+                      <div className="provider-runtime-meta" style={{ marginTop: 8 }}>
+                        {roundOverview}
+                      </div>
+                    </div>
+                  ) : null}
+                  {!stewardDraft && !stewardMemoryText && !stewardQuality && !argueDetection && !roundOverview ? (
                     <p className="notice" style={{ marginTop: 12 }}>
-                      这里会逐步长成真正的管家层。当前版本先把三件事做本地化：转述编排、上下文压缩、讨论质量提示。
+                      配置 DeepSeek API Key 并生成转述稿/质量检查，即可看到管家层的完整能力。
                     </p>
                   ) : null}
                 </div>

@@ -529,6 +529,130 @@ button {
   color: var(--muted);
 }
 
+/* ─── Quota bar (inside provider card) ─── */
+
+.quota-bar-wrap {
+  margin-top: 10px;
+}
+
+.quota-bar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.quota-bar-label {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.quota-bar-pct {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.quota-bar-pct.ok {
+  color: var(--success);
+}
+
+.quota-bar-pct.warn {
+  color: var(--warn);
+}
+
+.quota-bar-pct.danger {
+  color: var(--danger);
+}
+
+.quota-bar-track {
+  margin-top: 6px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.08);
+  overflow: hidden;
+}
+
+.quota-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 300ms ease;
+}
+
+.quota-bar-fill.ok {
+  background: var(--success);
+}
+
+.quota-bar-fill.warn {
+  background: var(--warn);
+}
+
+.quota-bar-fill.danger {
+  background: var(--danger);
+}
+
+.quota-bar-meta {
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--soft);
+}
+
+.quota-adjust {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  align-items: center;
+}
+
+.quota-adjust-input {
+  width: 80px;
+  height: 30px;
+  padding: 0 8px;
+  font-size: 11px;
+  border-radius: 10px;
+}
+
+/* ─── Quota alert, argue warning, round overview bars ─── */
+
+.quota-alert-bar {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(183, 121, 31, 0.1);
+  border: 1px solid rgba(183, 121, 31, 0.2);
+  margin-bottom: 10px;
+}
+
+.quota-alert-item {
+  font-size: 11px;
+  color: var(--warn);
+  line-height: 1.55;
+}
+
+.quota-alert-item + .quota-alert-item {
+  margin-top: 4px;
+}
+
+.argue-warning-bar {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(197, 48, 48, 0.08);
+  border: 1px solid rgba(197, 48, 48, 0.18);
+  font-size: 11px;
+  color: var(--danger);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.round-overview-bar {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(14, 159, 110, 0.07);
+  border: 1px solid rgba(14, 159, 110, 0.14);
+  font-size: 11px;
+  color: var(--success);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
 .featured-tag {
   display: inline-flex;
   align-items: center;
