@@ -1130,6 +1130,11 @@ function App() {
   const [liveTranscript, setLiveTranscript] = useState<TranscriptEntry[]>(() => readWebTranscript());
   const [composerText, setComposerText] = useState("");
   const [composerTarget, setComposerTarget] = useState<"all" | "gemini" | "openai" | "anthropic">("all");
+  const [editingReasonEntryId, setEditingReasonEntryId] = useState<string | null>(null);
+  const [editingReasonText, setEditingReasonText] = useState("");
+  const [editingFinalDraftReasonId, setEditingFinalDraftReasonId] = useState<string | null>(null);
+  const [editingFinalDraftReasonText, setEditingFinalDraftReasonText] = useState("");
+  const [handoffTargetSelect, setHandoffTargetSelect] = useState<WebBinding["provider"] | "">("");
   const [discussionStage, setDiscussionStage] = useState<DiscussionStage>("brief");
   const [stageNote, setStageNote] = useState("");
   const [finalWriterProvider, setFinalWriterProvider] = useState<WebBinding["provider"] | "">("");
@@ -2127,33 +2132,37 @@ function App() {
     if (!entry.id || entry.provider !== "user" || entry.state === "withdrawn") return;
     markTranscriptEntryState(entry.id, "withdrawn", "已撤回");
     setComposerText(entry.content);
-    const replacement = window.prompt("你撤回了这条消息。可以直接改写后发送给所有成员：", entry.content) || "";
-    if (!replacement.trim()) {
-      setNotice("已撤回原消息，原文已回填到输入框。");
-      return;
-    }
-    const correction = `【修正】甲方撤回了上一条指令，请忽略之前的内容。\n\n新的指令：${replacement.trim()}`;
-    setComposerText(replacement.trim());
-    if (boundBindings.length) {
-      await broadcastToBoundThreads(correction, "甲方修正");
-    }
-    setNotice("已撤回原消息，并向成员广播修正内容。");
+    setNotice("已撤回，原文已填入输入框。修改后直接发送即可。");
   }
 
-  async function redoModelReply(entry: TranscriptEntry) {
+  function startRedoModelReply(entry: TranscriptEntry) {
     if (!entry.id || entry.provider === "user" || entry.state === "rejected") return;
     const binding = bindings.find((item) => item.provider === entry.provider);
     if (!binding?.threadUrl.trim()) {
       setNotice("这个成员还没有绑定线程，暂时无法重做。");
       return;
     }
-    const reason = window.prompt("可选：告诉这个成员为什么要重做。", "") || "";
-    markTranscriptEntryState(entry.id, "rejected", reason.trim() ? `已驳回：${reason.trim()}` : "已驳回");
+    setEditingReasonEntryId(entry.id);
+    setEditingReasonText("");
+  }
+
+  function cancelRedoModelReply() {
+    setEditingReasonEntryId(null);
+    setEditingReasonText("");
+  }
+
+  async function confirmRedoModelReply(entry: TranscriptEntry) {
+    const binding = bindings.find((item) => item.provider === entry.provider);
+    if (!binding?.threadUrl.trim()) return;
+    const reason = editingReasonText.trim();
+    markTranscriptEntryState(entry.id!, "rejected", reason ? `已驳回：${reason}` : "已驳回");
+    setEditingReasonEntryId(null);
+    setEditingReasonText("");
     const redoPrompt = [
       `你上一条回复被甲方驳回了。`,
       topic.trim() ? `讨论主题：${topic.trim()}` : "",
       `你被驳回的内容：${entry.content}`,
-      reason.trim() ? `甲方意见：${reason.trim()}` : "",
+      reason ? `甲方意见：${reason}` : "",
       "请重新回答，聚焦主题，给出更可执行、更贴题的版本。",
     ]
       .filter(Boolean)
