@@ -218,6 +218,55 @@ Go to **设置与集成 -> Web Capture & Watch**:
 - `存为笔记` from clipping
 - `存入资料库` from clipping
 
+## AI Council 使用说明
+
+### 安装 Tampermonkey 桥接脚本
+
+AI Council 通过 Tampermonkey 油猴脚本与浏览器中的 ChatGPT / Claude / Gemini 页面通信：
+
+1. 安装 Chrome 扩展 [Tampermonkey](https://www.tampermonkey.net/)
+2. 点击 Tampermonkey 图标 → "创建新脚本"
+3. 将 [`tampermonkey/ai-council-bridge.js`](./tampermonkey/ai-council-bridge.js) 内容粘贴到编辑器中
+4. 保存脚本（Ctrl+S / Cmd+S）
+5. 打开 ChatGPT (chatgpt.com)、Claude (claude.ai)、Gemini (gemini.google.com) 页面
+6. 确认每个页面上的 Tampermonkey 图标显示脚本已启用
+
+### 启动应用
+
+```bash
+npm install
+npm run tauri:dev
+```
+
+启动后：
+- **桌面应用**：Tauri 窗口自动打开
+- **手机控制台**：局域网内访问 `http://<Mac的IP>:19281/mobile`
+- **桥接服务**：WebSocket 监听 `localhost:19280`，油猴脚本自动连接
+
+### 两种协作模式
+
+**群聊圆桌** — 多 AI 同时讨论，每轮汇总摘要
+
+1. 确保 ChatGPT / Claude / Gemini 页面已打开且油猴脚本已连接
+2. 输入讨论主题
+3. 发送消息，三个 AI 依次回复
+4. 管家自动总结每轮讨论，检测车轱辘话
+5. 支持管家润色用户输入
+
+**工作流接力** — AI 按步骤接力完成任务
+
+1. 输入议题，点击「分析议题」让管家推荐步骤
+2. 在「自动」或「逐步」模式间切换
+3. 每步由指定 AI 执行，产出自动传递给下一步
+4. 最后一步自动审核，不通过则回溯重跑
+5. 完成的步骤可保存为产物
+
+### 设置
+
+- 在设置页面配置 DeepSeek API Key（用于管家功能）
+- 查看各 provider 连接状态和额度使用情况
+- 手动调整额度上限
+
 ## Local Prerequisites
 
 You need these installed locally before the app can run:
