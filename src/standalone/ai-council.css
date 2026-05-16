@@ -1398,3 +1398,63 @@ h3.page-title + .card { margin-top: 0; }
   font-size: 15px;
   font-weight: 800;
 }
+
+/* 线程配置 */
+.binding-card { margin-bottom: 16px; }
+
+.binding-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+}
+
+.binding-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.binding-row:last-child { border-bottom: none; }
+
+.binding-provider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 150px;
+  flex-shrink: 0;
+}
+
+.binding-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+
+.binding-provider-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.binding-status-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.binding-input {
+  flex: 1;
+  height: 38px;
+  padding: 0 10px;
+  border: var(--border-width) solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  background: var(--surface);
+  box-shadow: 2px 2px 0px var(--border);
+  outline: none;
+  min-width: 0;
+}
+
+.binding-input:focus { border-color: var(--accent-purple); }

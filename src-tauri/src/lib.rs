@@ -4790,6 +4790,21 @@ async fn get_provider_status(
         .collect())
 }
 
+#[tauri::command]
+async fn set_thread_url(
+    state: State<'_, Arc<Mutex<BridgeState>>>,
+    provider: String,
+    url: String,
+) -> Result<(), String> {
+    let mut bridge = state.lock().unwrap();
+    if let Some(conn) = bridge.providers.get_mut(&provider) {
+        conn.status.connected = !url.is_empty();
+    }
+    // URL 由前端持久化到 localStorage，后端仅记录连接状态
+    let _ = url;
+    Ok(())
+}
+
 // ─── 手机端 Web Console ──────────────────────────────────────────
 
 async fn mobile_page() -> axum::response::Html<&'static str> {
@@ -11123,6 +11138,7 @@ pub fn run() {
             send_to_provider,
             read_from_provider,
             get_provider_status,
+            set_thread_url,
             list_library_file_links,
             replace_library_file_links,
             batch_set_library_file_tags,

@@ -44,6 +44,14 @@ type CouncilArtifact = {
   updatedAt: string;
 };
 
+type BindingStatus = "connected" | "disconnected" | "error";
+
+type ProviderBinding = {
+  provider: string;
+  threadUrl: string;
+  status: BindingStatus;
+};
+
 // ─── Main App ─────────────────────────────────────────────────────
 
 function App() {
@@ -75,6 +83,49 @@ function App() {
 
   // 产物状态
   const [artifacts, setArtifacts] = useState<CouncilArtifact[]>([]);
+
+  // 线程绑定
+  const [bindings, setBindings] = useState<ProviderBinding[]>(() => {
+    try {
+      const raw = localStorage.getItem("ai_council_bindings");
+      return raw ? JSON.parse(raw) : providers.map(p => ({ provider: p, threadUrl: "", status: "disconnected" as BindingStatus }));
+    } catch {
+      return providers.map(p => ({ provider: p, threadUrl: "", status: "disconnected" as BindingStatus }));
+    }
+  });
+
+  function updateBinding(provider: string, threadUrl: string) {
+    setBindings(prev => {
+      const next = prev.map(b => b.provider === provider ? { ...b, threadUrl } : b);
+      localStorage.setItem("ai_council_bindings", JSON.stringify(next));
+      return next;
+    });
+    // 通知 Rust 后端
+    invoke("set_thread_url", { provider, url: threadUrl }).catch(() => {});
+  }
+
+  // 定时拉取连接状态
+  useEffect(() => {
+    async function refreshStatus() {
+      try {
+        const statuses = await invoke<{ provider: string; connected: boolean }[]>("get_provider_status");
+        if (statuses && statuses.length > 0) {
+          setBindings(prev => {
+            const statusMap = new Map(statuses.map(s => [s.provider, s.connected]));
+            return prev.map(b => ({
+              ...b,
+              status: statusMap.has(b.provider)
+                ? (statusMap.get(b.provider) ? "connected" as BindingStatus : "error" as BindingStatus)
+                : b.status,
+            }));
+          });
+        }
+      } catch { /* bridge not ready yet */ }
+    }
+    refreshStatus();
+    const t = setInterval(refreshStatus, 5000);
+    return () => clearInterval(t);
+  }, []);
 
   // 额度管理器
   const quotaManager = useRef(new QuotaManager());
@@ -309,6 +360,8 @@ function App() {
             stewardApiKey={stewardApiKey}
             onSetApiKey={(k) => { setStewardApiKey(k); setDeepSeekKey(k); }}
             quotaManager={quotaManager.current}
+            bindings={bindings}
+            onUpdateBinding={updateBinding}
           />
         )}
       </div>
@@ -632,12 +685,15 @@ function ArtifactsPage({ artifacts }: { artifacts: CouncilArtifact[] }) {
 
 // ─── SettingsPage ─────────────────────────────────────────────────
 
-function SettingsPage({ stewardApiKey, onSetApiKey, quotaManager }: {
+function SettingsPage({ stewardApiKey, onSetApiKey, quotaManager, bindings, onUpdateBinding }: {
   stewardApiKey: string;
   onSetApiKey: (key: string) => void;
   quotaManager: QuotaManager;
+  bindings: ProviderBinding[];
+  onUpdateBinding: (provider: string, url: string) => void;
 }) {
   const [providers, setProviders] = useState<ProviderQuota[]>([]);
+  const [editingUrls, setEditingUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const t = setInterval(() => setProviders(quotaManager.getAll()), 3000);
@@ -645,9 +701,73 @@ function SettingsPage({ stewardApiKey, onSetApiKey, quotaManager }: {
     return () => clearInterval(t);
   }, [quotaManager]);
 
+  useEffect(() => {
+    const map: Record<string, string> = {};
+    bindings.forEach(b => { map[b.provider] = b.threadUrl; });
+    setEditingUrls(prev => ({ ...map, ...prev }));
+  }, [bindings]);
+
+  const providerLabels: Record<string, string> = {
+    chatgpt: "ChatGPT",
+    claude: "Claude",
+    gemini: "Gemini",
+  };
+
+  const providerPlaceholders: Record<string, string> = {
+    chatgpt: "https://chatgpt.com/c/xxx",
+    claude: "https://claude.ai/chat/xxx",
+    gemini: "https://gemini.google.com/app/xxx",
+  };
+
+  const statusDot = (status: BindingStatus) => {
+    const colors: Record<BindingStatus, string> = {
+      connected: "#10B981",
+      disconnected: "#9CA3AF",
+      error: "#EF4444",
+    };
+    return (
+      <span
+        className="binding-dot"
+        style={{ background: colors[status] }}
+        title={status === "connected" ? "已连接" : status === "error" ? "错误" : "未连接"}
+      />
+    );
+  };
+
   return (
     <div className="page-content settings-page">
       <h3 className="page-title">设置</h3>
+
+      {/* 成员线程配置 — 最重要，放在最顶部 */}
+      <div className="card binding-card">
+        <h4>成员线程配置</h4>
+        <p className="binding-hint">配置各 AI 的对话线程 URL，应用通过浏览器桥接脚本与这些页面通信。</p>
+        {bindings.map(b => (
+          <div key={b.provider} className="binding-row">
+            <div className="binding-provider">
+              {statusDot(b.status)}
+              <span className="binding-provider-name">{providerLabels[b.provider] || b.provider}</span>
+              <span className="binding-status-text">
+                {b.status === "connected" ? "已连接" : b.status === "error" ? "错误" : "未连接"}
+              </span>
+            </div>
+            <input
+              className="binding-input"
+              type="text"
+              placeholder={providerPlaceholders[b.provider] || `https://${b.provider}.com/...`}
+              value={editingUrls[b.provider] ?? b.threadUrl}
+              onChange={e => setEditingUrls(prev => ({ ...prev, [b.provider]: e.target.value }))}
+              onBlur={() => onUpdateBinding(b.provider, editingUrls[b.provider] ?? b.threadUrl)}
+            />
+            <button
+              className="btn-sm"
+              onClick={() => onUpdateBinding(b.provider, editingUrls[b.provider] ?? b.threadUrl)}
+            >
+              保存
+            </button>
+          </div>
+        ))}
+      </div>
 
       <div className="card">
         <h4>DeepSeek API Key</h4>
@@ -661,7 +781,7 @@ function SettingsPage({ stewardApiKey, onSetApiKey, quotaManager }: {
       </div>
 
       <div className="card">
-        <h4>成员状态</h4>
+        <h4>成员额度状态</h4>
         {providers.map(p => (
           <div key={p.provider} className="provider-status-row">
             <span className="provider-name">{p.provider}</span>
