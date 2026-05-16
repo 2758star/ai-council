@@ -18,7 +18,9 @@ use std::process::Command;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
+use futures_util::StreamExt;
 use tauri::{Manager, State};
+use tokio_tungstenite;
 
 mod keys {
     pub const GEMINI_API_KEY: &str = "gemini_api_key";
@@ -29,8 +31,18 @@ mod keys {
     pub const OPENAI_API_KEY: &str = "openai_api_key";
 }
 
-#[derive(Default)]
-struct AppState;
+#[derive(Clone)]
+struct AppState {
+    bridge: Arc<Mutex<BridgeState>>,
+}
+
+impl Default for AppState {
+    fn default() -> Self {
+        Self {
+            bridge: Arc::new(Mutex::new(BridgeState::new())),
+        }
+    }
+}
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -421,28 +433,32 @@ struct MathNotebookPayload {
     summary: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct WebSessionSendInput {
-    provider: String,
-    thread_url: String,
-    text: String,
-}
+// ─── AI Council Bridge 协议 ───────────────────────────────────────
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct WebSessionReadInput {
-    provider: String,
-    thread_url: String,
+struct BridgeMessage {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    r#type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    provider: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    text: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    status: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-struct WebSessionReadPayload {
+struct ProviderStatus {
     provider: String,
-    thread_url: String,
-    status: String,
-    text: String,
+    connected: bool,
+    is_streaming: bool,
+    has_input: bool,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -4524,294 +4540,253 @@ fn open_external_url(url: String) -> Result<(), String> {
     Ok(())
 }
 
-fn applescript_quote(input: &str) -> String {
-    input.replace('\\', "\\\\").replace('"', "\\\"")
+
+// ─── AI Council Bridge WebSocket 服务 ─────────────────────────────
+
+/// 桥接服务器共享状态
+struct BridgeState {
+    /// provider -> 连接信息
+    providers: HashMap<String, ProviderConnection>,
+    /// 等待回复的请求 id -> oneshot sender
+    pending: HashMap<String, tokio::sync::oneshot::Sender<Result<String, String>>>,
 }
 
-#[cfg(target_os = "macos")]
-fn execute_web_session_js_macos(thread_url: &str, js: &str) -> Result<String, String> {
-    let script = format!(
-        r#"
-set targetUrl to "{target_url}"
-set jsCode to "{js_code}"
-tell application "Google Chrome"
-  activate
-  set targetTab to missing value
-  repeat with w in windows
-    repeat with t in tabs of w
-      set currentUrl to URL of t
-      if currentUrl starts with targetUrl then
-        set targetTab to t
-        set active tab index of w to (index of t)
-        set index of w to 1
-        exit repeat
-      end if
-    end repeat
-    if targetTab is not missing value then exit repeat
-  end repeat
-  if targetTab is missing value then
-    open location targetUrl
-    delay 2
-    set targetTab to active tab of front window
-  end if
-  delay 1
-  execute javascript jsCode in targetTab
-end tell
-"#,
-        target_url = applescript_quote(thread_url),
-        js_code = applescript_quote(js)
-    );
+struct ProviderConnection {
+    sender: tokio::sync::mpsc::UnboundedSender<String>,
+    status: ProviderStatus,
+}
 
-    let output = Command::new("osascript")
-        .arg("-e")
-        .arg(script)
-        .output()
-        .map_err(|error| format!("failed to run osascript: {error}"))?;
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-        return Err(if stderr.trim().is_empty() {
-            "osascript 执行失败".to_string()
-        } else {
-            stderr
+impl BridgeState {
+    fn new() -> Self {
+        Self {
+            providers: HashMap::new(),
+            pending: HashMap::new(),
+        }
+    }
+}
+
+/// 启动 WebSocket 服务器
+async fn start_bridge_server(state: Arc<Mutex<BridgeState>>) -> Result<(), String> {
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:19280")
+        .await
+        .map_err(|e| format!("WebSocket 绑定失败: {e}"))?;
+
+    loop {
+        let (stream, _) = match listener.accept().await {
+            Ok(conn) => conn,
+            Err(_) => continue,
+        };
+
+        let state = state.clone();
+        tokio::spawn(async move {
+            let ws = match tokio_tungstenite::accept_async(stream).await {
+                Ok(ws) => ws,
+                Err(_) => return,
+            };
+
+            let (write, mut read) = ws.split();
+            let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<String>();
+
+            // 写任务：把 channel 中的消息写入 WebSocket
+            let write_task = tokio::spawn(async move {
+                use futures_util::SinkExt;
+                let mut write = write;
+                while let Some(msg) = rx.recv().await {
+                    let _ = write
+                        .send(tokio_tungstenite::tungstenite::Message::Text(msg.into()))
+                        .await;
+                }
+            });
+
+            let mut registered_provider: Option<String> = None;
+
+            // 读任务：处理来自油猴脚本的消息
+            while let Some(Ok(msg)) = read.next().await {
+                let text = match msg {
+                    tokio_tungstenite::tungstenite::Message::Text(t) => t,
+                    tokio_tungstenite::tungstenite::Message::Close(_) => break,
+                    _ => continue,
+                };
+
+                let parsed: BridgeMessage = match serde_json::from_str(&text) {
+                    Ok(m) => m,
+                    Err(_) => continue,
+                };
+
+                let msg_type = parsed.r#type.as_deref().unwrap_or("");
+
+                match msg_type {
+                    "register" => {
+                        if let Some(ref provider) = parsed.provider {
+                            let mut state = state.lock().unwrap();
+                            state.providers.insert(
+                                provider.clone(),
+                                ProviderConnection {
+                                    sender: tx.clone(),
+                                    status: ProviderStatus {
+                                        provider: provider.clone(),
+                                        connected: true,
+                                        is_streaming: false,
+                                        has_input: false,
+                                    },
+                                },
+                            );
+                            registered_provider = Some(provider.clone());
+                        }
+                    }
+                    "send_ack" => {
+                        if let (Some(ref id), Some(ref status)) = (&parsed.id, &parsed.status) {
+                            let mut state = state.lock().unwrap();
+                            if let Some(sender) = state.pending.remove(id.as_str()) {
+                                if status == "ok" {
+                                    let _ = sender.send(Ok("sent".to_string()));
+                                } else {
+                                    let err = parsed
+                                        .error
+                                        .unwrap_or_else(|| "unknown error".to_string());
+                                    let _ = sender.send(Err(err));
+                                }
+                            }
+                        }
+                    }
+                    "read_ack" => {
+                        if let Some(ref id) = parsed.id {
+                            let mut state = state.lock().unwrap();
+                            if let Some(sender) = state.pending.remove(id.as_str()) {
+                                match (parsed.status.as_deref(), parsed.text.as_deref()) {
+                                    (Some("error"), _) => {
+                                        let err = parsed
+                                            .error
+                                            .unwrap_or_else(|| "read failed".to_string());
+                                        let _ = sender.send(Err(err));
+                                    }
+                                    (_, Some(text)) => {
+                                        let _ = sender.send(Ok(text.to_string()));
+                                    }
+                                    _ => {
+                                        let _ = sender.send(Err("empty reply".to_string()));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    "status_ack" => {
+                        if let Some(ref provider) = parsed.provider {
+                            let mut state = state.lock().unwrap();
+                            if let Some(conn) = state.providers.get_mut(provider) {
+                                if let Some(ref status_str) = parsed.status {
+                                    conn.status.is_streaming = status_str == "streaming" || status_str == "true";
+                                    conn.status.has_input = status_str == "true";
+                                }
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+
+            // 清理：断开时移除 provider
+            if let Some(provider) = registered_provider {
+                let mut state = state.lock().unwrap();
+                state.providers.remove(&provider);
+            }
+
+            write_task.abort();
         });
     }
-    Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
-}
-
-#[cfg(target_os = "macos")]
-fn build_provider_send_js(provider: &str, text: &str) -> String {
-    let escaped_text = serde_json::to_string(text).unwrap_or_else(|_| "\"\"".to_string());
-    let send_selectors = match provider {
-        "openai" => vec![
-            "button[data-testid='send-button']",
-            "button[aria-label='Send prompt']",
-            "button[aria-label='Send message']",
-            "button[aria-label*='Send' i]",
-        ],
-        "anthropic" => vec![
-            "button[aria-label='Send Message']",
-            "button[aria-label='Send message']",
-            "button[aria-label*='Send' i]",
-            "fieldset button[type='button']",
-        ],
-        "gemini" => vec![
-            "button[aria-label='Send message']",
-            "button[mattooltip='Send message']",
-            "button.send-button",
-            "button[aria-label*='Send' i]",
-        ],
-        _ => vec![
-            "button[data-testid='send-button']",
-            "button[aria-label='Send message']",
-        ],
-    };
-    let selectors_json = serde_json::to_string(&send_selectors).unwrap_or_else(|_| "[]".to_string());
-    format!(
-        r#"(function() {{
-  const text = {escaped_text};
-  const sendSelectors = {selectors_json};
-  const editableSelectors = [
-    'textarea[placeholder]',
-    'div[contenteditable=\"true\"][data-placeholder]',
-    'textarea',
-    'div[contenteditable="true"]',
-    'div.ProseMirror',
-    'p[data-placeholder]',
-    '[role="textbox"]'
-  ];
-  const visible = (node) => {{
-    if (!node) return false;
-    const style = window.getComputedStyle(node);
-    const rect = node.getBoundingClientRect();
-    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
-  }};
-  const editable = editableSelectors
-    .flatMap((selector) => Array.from(document.querySelectorAll(selector)))
-    .filter((node) => visible(node))
-    .at(-1);
-  if (!editable) {{
-    throw new Error('input_not_found');
-  }}
-  editable.focus();
-  if (editable.tagName === 'TEXTAREA') {{
-    editable.value = text;
-    editable.dispatchEvent(new Event('input', {{ bubbles: true }}));
-    editable.dispatchEvent(new Event('change', {{ bubbles: true }}));
-  }} else {{
-    editable.textContent = '';
-    editable.dispatchEvent(new InputEvent('beforeinput', {{ bubbles: true, inputType: 'insertText', data: text }}));
-    try {{
-      const selection = window.getSelection();
-      const range = document.createRange();
-      range.selectNodeContents(editable);
-      range.collapse(false);
-      selection.removeAllRanges();
-      selection.addRange(range);
-      document.execCommand('insertText', false, text);
-    }} catch (_error) {{}}
-    if (!editable.textContent || editable.textContent.trim().length === 0) {{
-      editable.textContent = text;
-      editable.dispatchEvent(new Event('input', {{ bubbles: true }}));
-    }}
-    editable.dispatchEvent(new InputEvent('input', {{ bubbles: true, inputType: 'insertText', data: text }}));
-  }}
-  const sendButton = sendSelectors
-    .flatMap((selector) => Array.from(document.querySelectorAll(selector)))
-    .find((node) => visible(node) && !node.disabled && node.getAttribute('aria-disabled') !== 'true');
-  if (sendButton) {{
-    sendButton.click();
-    return 'sent_via_button';
-  }}
-  const keydown = new KeyboardEvent('keydown', {{ key: 'Enter', code: 'Enter', which: 13, keyCode: 13, bubbles: true }});
-  const keypress = new KeyboardEvent('keypress', {{ key: 'Enter', code: 'Enter', which: 13, keyCode: 13, bubbles: true }});
-  const keyup = new KeyboardEvent('keyup', {{ key: 'Enter', code: 'Enter', which: 13, keyCode: 13, bubbles: true }});
-  editable.dispatchEvent(keydown);
-  editable.dispatchEvent(keypress);
-  editable.dispatchEvent(keyup);
-  return 'sent_via_enter';
-}})();"#,
-    )
-}
-
-#[cfg(target_os = "macos")]
-fn build_provider_read_js(provider: &str) -> String {
-    let assistant_selectors = match provider {
-        "openai" => vec![
-            "[data-message-author-role='assistant']",
-            "[data-testid^='conversation-turn-'] [data-message-author-role='assistant']",
-            "article [data-message-author-role='assistant']",
-            ".markdown",
-        ],
-        "anthropic" => vec![
-            "[data-testid='assistant-message']",
-            "[data-is-streaming]",
-            "article .prose",
-            ".font-claude-message",
-            ".prose",
-        ],
-        "gemini" => vec![
-            "model-response",
-            "message-content",
-            ".model-response-text",
-            "[data-response-id]",
-            ".response-container-content",
-            ".response-content message-content",
-        ],
-        _ => vec![".markdown", ".prose", "[role='article']"],
-    };
-    let selectors_json = serde_json::to_string(&assistant_selectors).unwrap_or_else(|_| "[]".to_string());
-    format!(
-        r#"(function() {{
-  const assistantSelectors = {selectors_json};
-  const pickVisibleText = (node) => {{
-    if (!node) return '';
-    const style = window.getComputedStyle(node);
-    const rect = node.getBoundingClientRect();
-    if (style && (style.display === 'none' || style.visibility === 'hidden')) return '';
-    if (!rect || rect.width === 0 || rect.height === 0) return '';
-    return (node.innerText || node.textContent || '').trim();
-  }};
-
-  const candidates = [];
-  for (const selector of assistantSelectors) {{
-    for (const node of document.querySelectorAll(selector)) {{
-      const text = pickVisibleText(node);
-      if (!text) continue;
-      candidates.push(text);
-    }}
-  }}
-
-  let text = '';
-  if (candidates.length) {{
-    text = candidates[candidates.length - 1];
-  }} else {{
-    const fallbackNodes = Array.from(document.querySelectorAll('main div, main p, article div, article p, section div'))
-      .map((node) => pickVisibleText(node))
-      .filter((value) => value && value.length > 40);
-    if (fallbackNodes.length) {{
-      text = fallbackNodes[fallbackNodes.length - 1];
-    }}
-  }}
-
-  const loading = Boolean(
-    document.querySelector('[aria-label*="Stop" i]') ||
-    document.querySelector('[data-testid=\"stop-button\"]') ||
-    document.querySelector('.loading, .generating, .typing')
-  );
-
-  return JSON.stringify({{
-    status: loading ? 'responding' : text ? 'ready' : 'empty',
-    text
-  }});
-}})();"#,
-    )
-}
-
-#[cfg(target_os = "macos")]
-fn send_web_session_message_macos(input: &WebSessionSendInput) -> Result<String, String> {
-    let provider = input.provider.trim().to_lowercase();
-    let thread_url = input.thread_url.trim();
-    let text = input.text.trim();
-    if thread_url.is_empty() {
-        return Err("thread_url 不能为空".to_string());
-    }
-    if text.is_empty() {
-        return Err("text 不能为空".to_string());
-    }
-
-    let js = build_provider_send_js(&provider, text);
-    execute_web_session_js_macos(thread_url, &js)
 }
 
 #[tauri::command]
-fn send_web_session_message(payload: WebSessionSendInput) -> Result<String, String> {
-    #[cfg(target_os = "macos")]
+async fn send_to_provider(
+    state: State<'_, Arc<Mutex<BridgeState>>>,
+    provider: String,
+    text: String,
+    request_id: String,
+) -> Result<String, String> {
+    let (tx, rx) = tokio::sync::oneshot::channel();
     {
-        return send_web_session_message_macos(&payload);
+        let mut bridge = state.lock().unwrap();
+        let conn = bridge
+            .providers
+            .get(&provider)
+            .ok_or_else(|| format!("{provider} 未连接"))?;
+
+        let msg = BridgeMessage {
+            r#type: Some("send".to_string()),
+            id: Some(request_id.clone()),
+            provider: Some(provider.clone()),
+            text: Some(text),
+            status: None,
+            error: None,
+        };
+        let json = serde_json::to_string(&msg).map_err(|e| format!("序列化失败: {e}"))?;
+        conn.sender
+            .send(json)
+            .map_err(|_| format!("{provider} 连接已断开"))?;
+
+        bridge.pending.insert(request_id.clone(), tx);
     }
-    #[allow(unreachable_code)]
-    Err("当前仅支持 macOS 自动发送。".to_string())
-}
 
-#[cfg(target_os = "macos")]
-fn read_web_session_message_macos(input: &WebSessionReadInput) -> Result<WebSessionReadPayload, String> {
-    let provider = input.provider.trim().to_lowercase();
-    let thread_url = input.thread_url.trim();
-    if thread_url.is_empty() {
-        return Err("thread_url 不能为空".to_string());
+    match tokio::time::timeout(Duration::from_secs(120), rx).await {
+        Ok(Ok(result)) => result,
+        Ok(Err(_)) => Err("通道关闭".to_string()),
+        Err(_) => {
+            state.lock().unwrap().pending.remove(&request_id);
+            Err("等待回复超时".to_string())
+        }
     }
-
-    let raw = execute_web_session_js_macos(thread_url, &build_provider_read_js(&provider))?;
-    let parsed: serde_json::Value =
-        serde_json::from_str(&raw).map_err(|error| format!("invalid web session payload: {error}; raw={raw}"))?;
-    let status = parsed
-        .get("status")
-        .and_then(|value| value.as_str())
-        .unwrap_or("unknown")
-        .to_string();
-    let text = parsed
-        .get("text")
-        .and_then(|value| value.as_str())
-        .unwrap_or("")
-        .trim()
-        .to_string();
-
-    Ok(WebSessionReadPayload {
-        provider,
-        thread_url: thread_url.to_string(),
-        status,
-        text,
-    })
 }
 
 #[tauri::command]
-fn read_web_session_message(payload: WebSessionReadInput) -> Result<WebSessionReadPayload, String> {
-    #[cfg(target_os = "macos")]
+async fn read_from_provider(
+    state: State<'_, Arc<Mutex<BridgeState>>>,
+    provider: String,
+    request_id: String,
+) -> Result<String, String> {
+    let (tx, rx) = tokio::sync::oneshot::channel();
     {
-        return read_web_session_message_macos(&payload);
+        let mut bridge = state.lock().unwrap();
+        let conn = bridge
+            .providers
+            .get(&provider)
+            .ok_or_else(|| format!("{provider} 未连接"))?;
+
+        let msg = BridgeMessage {
+            r#type: Some("read".to_string()),
+            id: Some(request_id.clone()),
+            provider: Some(provider.clone()),
+            text: None,
+            status: None,
+            error: None,
+        };
+        let json = serde_json::to_string(&msg).map_err(|e| format!("序列化失败: {e}"))?;
+        conn.sender
+            .send(json)
+            .map_err(|_| format!("{provider} 连接已断开"))?;
+
+        bridge.pending.insert(request_id.clone(), tx);
     }
-    #[allow(unreachable_code)]
-    Err("当前仅支持 macOS 读取网页消息。".to_string())
+
+    match tokio::time::timeout(Duration::from_secs(120), rx).await {
+        Ok(Ok(result)) => result,
+        Ok(Err(_)) => Err("通道关闭".to_string()),
+        Err(_) => {
+            state.lock().unwrap().pending.remove(&request_id);
+            Err("等待回复超时".to_string())
+        }
+    }
+}
+
+#[tauri::command]
+async fn get_provider_status(
+    state: State<'_, Arc<Mutex<BridgeState>>>,
+) -> Result<Vec<ProviderStatus>, String> {
+    let bridge = state.lock().unwrap();
+    Ok(bridge
+        .providers
+        .values()
+        .map(|c| c.status.clone())
+        .collect())
 }
 
 #[tauri::command]
@@ -11052,6 +11027,12 @@ pub fn run() {
         .manage(AppState::default())
         .setup(|app| {
             try_auto_start_background_services(&app.handle().clone());
+            let bridge_state = app.state::<AppState>().bridge.clone();
+            tauri::async_runtime::spawn(async move {
+                if let Err(e) = start_bridge_server(bridge_state).await {
+                    eprintln!("Bridge server error: {e}");
+                }
+            });
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -11115,8 +11096,9 @@ pub fn run() {
             toggle_library_file_favorite,
             open_library_file,
             open_external_url,
-            send_web_session_message,
-            read_web_session_message,
+            send_to_provider,
+            read_from_provider,
+            get_provider_status,
             list_library_file_links,
             replace_library_file_links,
             batch_set_library_file_tags,
