@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>AI Council Mobile</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #FFFDF7;
+      color: #1a1a1a;
+      padding: 16px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    h2 { font-size: 18px; margin-bottom: 12px; }
+    .status { padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+    .status.running { background: #D1FAE5; color: #065F46; }
+    .status.paused { background: #FEF3C7; color: #92400E; }
+    .status.idle { background: #E5E7EB; color: #4B5563; }
+    .msg-list { margin-bottom: 12px; }
+    .msg {
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      border: 1.5px solid #ddd;
+    }
+    .input-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    input {
+      flex: 1; padding: 10px;
+      border: 2px solid #222;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px 16px;
+      background: #1a1a1a;
+      color: white;
+      border: 2px solid #222;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:active { transform: translateY(1px); }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+    .controls button { flex: 1; min-width: 80px; }
+  </style>
+</head>
+<body>
+  <h2>AI Council Mobile</h2>
+  <div class="status idle" id="status">空闲</div>
+  <div class="msg-list" id="messages"></div>
+  <div class="input-row">
+    <input id="input" placeholder="输入消息或指令..." />
+    <button onclick="sendMsg()">发送</button>
+  </div>
+  <div class="controls" id="controls">
+    <button onclick="action('continue')">继续</button>
+    <button onclick="action('pause')">暂停</button>
+    <button onclick="location.reload()">刷新</button>
+  </div>
+
+  <script>
+    const API = '/api';
+    let messages = [];
+
+    async function checkStatus() {
+      try {
+        const resp = await fetch(API + '/status');
+        const data = await resp.json();
+        document.getElementById('status').textContent = data.workflowStatus || 'idle';
+        document.getElementById('status').className = 'status ' + (data.workflowStatus || 'idle');
+        if (data.messages) {
+          messages = data.messages.slice(-5);
+          renderMessages();
+        }
+      } catch {}
+    }
+
+    function renderMessages() {
+      const el = document.getElementById('messages');
+      el.innerHTML = messages.map(m =>
+        `<div class="msg"><strong>${m.role || ''}</strong> ${m.content || ''}</div>`
+      ).join('');
+    }
+
+    function sendMsg() {
+      const input = document.getElementById('input');
+      if (!input.value.trim()) return;
+      fetch(API + '/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: input.value }),
+      }).catch(() => {});
+      input.value = '';
+    }
+
+    function action(act) {
+      fetch(API + '/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: act }),
+      }).catch(() => {});
+    }
+
+    setInterval(checkStatus, 5000);
+    checkStatus();
+  </script>
+</body>
+</html>

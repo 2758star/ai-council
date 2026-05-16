@@ -18,6 +18,7 @@ use std::process::Command;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
+use axum::{routing::get, Router};
 use futures_util::StreamExt;
 use tauri::{Manager, State};
 use tokio_tungstenite;
@@ -4787,6 +4788,24 @@ async fn get_provider_status(
         .values()
         .map(|c| c.status.clone())
         .collect())
+}
+
+// ─── 手机端 Web Console ──────────────────────────────────────────
+
+async fn mobile_page() -> axum::response::Html<&'static str> {
+    axum::response::Html(include_str!("../../mobile-console.html"))
+}
+
+async fn start_mobile_server() -> Result<(), String> {
+    let app = Router::new().route("/mobile", get(mobile_page));
+
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:19281")
+        .await
+        .map_err(|e| format!("移动端服务器绑定失败: {e}"))?;
+
+    axum::serve(listener, app)
+        .await
+        .map_err(|e| format!("移动端服务器错误: {e}"))
 }
 
 #[tauri::command]
@@ -11031,6 +11050,11 @@ pub fn run() {
             tauri::async_runtime::spawn(async move {
                 if let Err(e) = start_bridge_server(bridge_state).await {
                     eprintln!("Bridge server error: {e}");
+                }
+            });
+            tauri::async_runtime::spawn(async move {
+                if let Err(e) = start_mobile_server().await {
+                    eprintln!("Mobile server error: {e}");
                 }
             });
             Ok(())
