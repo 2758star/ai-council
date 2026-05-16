@@ -223,7 +223,7 @@ const ROUND_SUMMARY_SYSTEM = `你是 AI Council 的管家，负责在每轮结�
 
 只输出 2 句话，不要 JSON，不要任何前缀。`;
 
-export async function summarizeRound(input: {
+export async function summarizeRoundLegacy(input: {
   topic: string;
   roundNumber: number;
   replies: Record<string, string>;
@@ -238,4 +238,155 @@ export async function summarizeRound(input: {
       .join("\n")}`,
   ].join("\n");
   return await callDeepSeek(ROUND_SUMMARY_SYSTEM, userMsg, 300);
+}
+
+// 向后兼容别名
+export { summarizeRoundLegacy as summarizeRound };
+
+// ─── Phase 3: 新管家函数 ─────────────────────────────────────────
+
+/** 简化版 DeepSeek 调用（单 prompt + apiKey） */
+async function callDeepSeekWithKey(prompt: string, apiKey: string, maxTokens = 900): Promise<string> {
+  const resp = await fetch(`${DEEPSEEK_BASE}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: DEEPSEEK_MODEL,
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.3,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    throw new Error(`DeepSeek API ${resp.status}: ${text.slice(0, 200)}`);
+  }
+
+  const data = await resp.json();
+  const content = data?.choices?.[0]?.message?.content;
+  if (!content) throw new Error("DEEPSEEK_EMPTY_RESPONSE");
+  return content;
+}
+
+export interface WorkflowStep {
+  step: number;
+  provider: string;
+  name: string;
+  task: string;
+}
+
+const DEFAULT_WORKFLOW_STEPS: WorkflowStep[] = [
+  { step: 1, provider: 'claude', name: '制定框架', task: '分析问题核心，给出整体思路和方案框架' },
+  { step: 2, provider: 'gemini', name: '创意发散', task: '基于框架提供创新视角和发散思维' },
+  { step: 3, provider: 'chatgpt', name: '信息补充', task: '补充相关信息、数据和案例支撑' },
+  { step: 4, provider: 'gemini', name: '写作草稿', task: '综合前几步内容，写出完整草稿' },
+  { step: 5, provider: 'claude', name: '审查完善', task: '检查草稿，提出修改意见和完善建议' },
+  { step: 6, provider: 'chatgpt', name: '修改终稿', task: '根据意见修改，生成最终版本' },
+  { step: 7, provider: 'claude', name: '最终审核', task: '最终把关，确认质量达标或指出问题' },
+];
+
+// 1. 每轮结束后生成摘要（群聊模式）
+export async function summarizeRoundNew(
+  round: number,
+  topic: string,
+  replies: Record<string, string>,
+  apiKey: string
+): Promise<string> {
+  const prompt = `你是一个多模型讨论的管家助手。以下是第${round}轮各AI的回复：
+
+${Object.entries(replies).map(([p, r]) => `【${p}】${r}`).join('\n\n')}
+
+请用200字以内总结本轮的核心观点、共识和分歧，供下一轮参考。用中文回复，简洁直接。`;
+
+  return await callDeepSeekWithKey(prompt, apiKey);
+}
+
+// 2. 检测车轱辘话（连续两轮重复度高）
+export function detectRepetition(
+  currentReplies: Record<string, string>,
+  previousReplies: Record<string, string>
+): string[] {
+  const repeated: string[] = [];
+  Object.entries(currentReplies).forEach(([provider, current]) => {
+    const prev = previousReplies[provider];
+    if (!prev) return;
+    const currentWords = new Set(current.split(/\s+/));
+    const prevWords = new Set(prev.split(/\s+/));
+    const intersection = [...currentWords].filter(w => prevWords.has(w)).length;
+    const similarity = intersection / Math.max(currentWords.size, prevWords.size);
+    if (similarity > 0.7) repeated.push(provider);
+  });
+  return repeated;
+}
+
+// 3. 分析议题，推荐工作流步骤
+export async function analyzeTopicForWorkflow(
+  topic: string,
+  apiKey: string
+): Promise<WorkflowStep[]> {
+  const prompt = `你是一个项目管理助手。用户想讨论或完成以下任务：
+
+"${topic}"
+
+请分析这个任务，推荐一个5-7步的接力协作流程。
+每步指定：执行者（从 chatgpt/claude/gemini 中选一个）、任务名称（10字内）、具体任务描述（50字内）。
+
+只返回 JSON 数组，格式如下，不要有任何其他文字：
+[
+  {"step": 1, "provider": "claude", "name": "制定框架", "task": "分析问题核心，给出整体思路和框架"},
+  {"step": 2, "provider": "gemini", "name": "创意发散", "task": "基于框架提供创新视角和补充想法"}
+]`;
+
+  const result = await callDeepSeekWithKey(prompt, apiKey);
+  try {
+    return JSON.parse(result.replace(/```json|```/g, '').trim());
+  } catch {
+    return DEFAULT_WORKFLOW_STEPS;
+  }
+}
+
+// 4. 为工作流每步构建 prompt（包含前面所有步骤的产出）
+export function buildWorkflowStepPrompt(
+  topic: string,
+  currentStep: WorkflowStep,
+  previousOutputs: Record<number, string>
+): string {
+  const history = Object.entries(previousOutputs)
+    .sort(([a], [b]) => Number(a) - Number(b))
+    .map(([step, output]) => `【第${step}步产出】${output}`)
+    .join('\n\n');
+
+  return `你正在参与一个多AI协作工作流，用中文回复。
+
+【议题】${topic}
+
+${history ? `【前面步骤的产出】\n${history}\n` : ''}
+【你的任务（第${currentStep.step}步/${currentStep.name}）】
+${currentStep.task}
+
+请直接给出你的输出，不要重复前面的内容，聚焦在你的任务上。`;
+}
+
+// 5. 为群聊每轮构建 prompt
+export function buildRoundtablePrompt(
+  topic: string,
+  provider: string,
+  round: number,
+  contextPkg: { skeleton: string; summary: string; recentRounds: string },
+  userMessage: string
+): string {
+  const parts = [
+    `你正在参与一个多AI群聊讨论，用中文回复，不超过300字。`,
+    `【讨论主题】${topic}`,
+  ];
+  if (contextPkg.skeleton) parts.push(`【背景总纲】${contextPkg.skeleton}`);
+  if (contextPkg.summary) parts.push(`【前情摘要】${contextPkg.summary}`);
+  if (contextPkg.recentRounds) parts.push(`【最近讨论】\n${contextPkg.recentRounds}`);
+  parts.push(`【用户发言（第${round}轮）】${userMessage}`);
+  parts.push(`请直接发表你的观点，不要重复别人说过的内容。`);
+  return parts.join('\n\n');
 }
